@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Ansarul! ❤️</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: #fff;
+            position: fixed;
+            touch-action: manipulation;
+        }
+        
+        /* App Container */
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            max-height: -webkit-fill-available;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Screen Common */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+        
+        /* Password Screen */
+        #passwordScreen {
+            z-index: 10;
+        }
+        
+        .lock-icon {
+            font-size: 4rem;
+            color: #ff6b8b;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        .app-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.8rem;
+            text-align: center;
+            color: #ffd166;
+            margin-bottom: 15px;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
+        }
+        
+        .app-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            padding: 0 20px;
+            max-width: 400px;
+        }
+        
+        .password-box {
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 25px;
+        }
+        
+        #passwordInput {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 107, 139, 0.3);
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        
+        #passwordInput:focus {
+            outline: none;
+            border-color: #ff6b8b;
+            box-shadow: 0 0 20px rgba(255, 107, 139, 0.3);
+        }
+        
+        .app-btn {
+            width: 100%;
+            max-width: 320px;
+            background: linear-gradient(135deg, #ff6b8b 0%, #ff4081 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(255, 107, 139, 0.3);
+            touch-action: manipulation;
+        }
+        
+        .app-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .hint-text {
+            color: #ffd166;
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: rgba(255, 209, 102, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #ffd166;
+            max-width: 320px;
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            min-height: 24px;
+            animation: shake 0.5s;
+        }
+        
+        /* Photo Video Screen */
+        #photoVideoScreen {
+            transform: translateX(100%);
+        }
+        
+        .video-container {
+            width: 100%;
+            height: 70vh;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .animated-photo {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+        }
+        
+        .animated-photo.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .video-title {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 3;
+            padding: 0 20px;
+        }
+        
+        .video-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #ffd166;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .video-message {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .skip-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 3;
+            cursor: pointer;
+        }
+        
+        /* Cake Screen - FIXED CENTER */
+        #cakeScreen {
+            transform: translateX(100%);
+        }
+        
+        .cake-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #ffd166;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .cake-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 40px;
+        }
+        
+        .cake {
+            position: relative;
+            width: 250px;
+            height: 150px;
+            /* Removed left positioning - now centered by parent flex */
+        }
+        
+        .cake-bottom {
+            width: 250px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            border-radius: 10px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cake-middle {
+            width: 220px;
+            height: 50px;
+            background: linear-gradient(45deg, #ffcc80, #ffb347);
+            border-radius: 10px;
+            position: absolute;
+            bottom: 60px;
+            left: 15px;
+            box-shadow: inset 0 -8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cake-top {
+            width: 200px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            bottom: 110px;
+            left: 25px;
+            box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .candle {
+            width: 12px;
+            height: 50px;
+            background: linear-gradient(to bottom, #ff6b8b, #ff4081);
+            position: absolute;
+            bottom: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 6px 6px 0 0;
+            z-index: 2;
+        }
+        
+        .flame {
+            width: 25px;
+            height: 50px;
+            background: radial-gradient(ellipse at center, #ffd166 0%, #ff9e00 70%, transparent 100%);
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            bottom: 210px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: flicker 0.8s infinite alternate;
+            box-shadow: 0 0 30px #ff9e00;
+            filter: blur(1px);
+            z-index: 3;
+        }
+        
+        .blow-instruction {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+        
+        .blow-btn {
+            background: linear-gradient(135deg, #ffd166 0%, #ff9e00 100%);
+            color: #1a1a2e;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(255, 209, 102, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .blow-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* Wish Screen */
+        #wishScreen {
+            transform: translateX(100%);
+        }
+        
+        .wish-container {
+            width: 100%;
+            height: 70vh;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 107, 139, 0.2);
+            position: relative;
+        }
+        
+        .wish-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .wish-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .wish-container::-webkit-scrollbar-thumb {
+            background: #ff6b8b;
+            border-radius: 10px;
+        }
+        
+        .wish-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+            white-space: pre-line;
+            text-align: left;
+        }
+        
+        .wish-text span {
+            color: #ffd166;
+            font-weight: 600;
+        }
+        
+        .wish-signature {
+            text-align: right;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .signature-name {
+            text-align: right;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #ff6b8b;
+            margin-bottom: 5px;
+        }
+        
+        /* Gift Screen - UPDATED WITH NOTE */
+        #giftScreen {
+            transform: translateX(100%);
+        }
+        
+        .gift-box {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #ff6b8b 0%, #ff4081 100%);
+            margin: 0 auto 30px;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(255, 107, 139, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .gift-box:active {
+            transform: scale(0.95);
+        }
+        
+        .gift-lid {
+            width: 220px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff4081 0%, #ff6b8b 100%);
+            position: absolute;
+            top: -20px;
+            left: -10px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .gift-ribbon {
+            width: 60px;
+            height: 100%;
+            background: #ffd166;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .gift-ribbon:before {
+            content: '';
+            width: 100%;
+            height: 60px;
+            background: #ffd166;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .gift-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            color: white;
+        }
+        
+        .gift-code-section {
+            width: 100%;
+            max-width: 320px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+        
+        .gift-code-title {
+            font-size: 1.4rem;
+            color: #ffd166;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .gift-code {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-family: monospace;
+            border: 2px solid #ff6b8b;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        /* UPDATED GIFT NOTE */
+        .gift-note {
+            background: rgba(255, 209, 102, 0.1);
+            border-left: 4px solid #ffd166;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .gift-note-title {
+            color: #ffd166;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .gift-note-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .copy-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 8px 20px rgba(66, 165, 245, 0.3);
+        }
+        
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+        }
+        
+        .final-message {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            line-height: 1.6;
+            max-width: 320px;
+            margin: 0 auto;
+            display: none;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) rotate(-5deg); opacity: 0.9; }
+            100% { transform: translateX(-50%) scale(1.2) rotate(5deg); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes smoke {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(2); opacity: 0; }
+        }
+        
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #ff6b8b;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 360px) {
+            .app-title { font-size: 2.3rem; }
+            .cake-container { height: 250px; }
+            .cake { width: 200px; height: 120px; }
+            .cake-bottom { width: 200px; height: 50px; }
+            .cake-middle { width: 170px; height: 40px; bottom: 50px; left: 15px; }
+            .cake-top { width: 150px; height: 40px; bottom: 90px; left: 25px; }
+            .candle { bottom: 140px; }
+            .flame { bottom: 180px; }
+        }
+        
+        @media (max-height: 700px) {
+            .video-container { height: 60vh; }
+            .wish-container { height: 60vh; }
+            .cake-container { height: 250px; }
+        }
+        
+        /* Prevent text selection */
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div style="color: #ffd166; font-size: 1.2rem; margin-top: 20px;">Loading Birthday Surprise...</div>
+    </div>
+    
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Password Screen -->
+        <div class="screen" id="passwordScreen">
+            <div class="lock-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            
+            <h1 class="app-title">Happy Birthday!</h1>
+            <p class="app-subtitle">Enter the password to unlock a special birthday surprise for Ansarul Islam</p>
+            
+            <div class="password-box">
+                <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off" autocapitalize="none" autocorrect="off">
+            </div>
+            
+            <button class="app-btn" id="submitBtn">
+                Unlock Surprise
+            </button>
+            
+            <div class="hint-text">Hint: Your full name</div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+        
+        <!-- Photo Video Screen -->
+        <div class="screen" id="photoVideoScreen">
+            <div class="video-container">
+                <div id="photoContainer">
+                    <!-- Photos will be loaded here -->
+                </div>
+                <div class="video-overlay"></div>
+                
+                <div class="video-title">
+                    <div class="video-name" id="videoName">Ansarul Islam</div>
+                    <div class="video-message" id="videoMessage">Your special birthday memories</div>
+                </div>
+                
+                <button class="skip-btn" id="skipVideoBtn">
+                    Skip <i class="fas fa-forward"></i>
+                </button>
+            </div>
+            
+            <button class="app-btn" id="nextToCakeBtn" style="display: none;">
+                Blow the Candle <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <!-- Cake Screen - FIXED CENTER -->
+        <div class="screen" id="cakeScreen">
+            <h2 class="cake-title">Make a Wish! 🎂</h2>
+            <p class="blow-instruction">Make your birthday wish and blow out the candle</p>
+            
+            <div class="cake-container">
+                <div class="cake">
+                    <div class="cake-bottom"></div>
+                    <div class="cake-middle"></div>
+                    <div class="cake-top"></div>
+                    <div class="candle"></div>
+                    <div class="flame" id="flame"></div>
+                </div>
+            </div>
+            
+            <button class="blow-btn" id="blowBtn">
+                <i class="fas fa-wind"></i> Blow the Candle
+            </button>
+        </div>
+        
+        <!-- Wish Screen -->
+        <div class="screen" id="wishScreen">
+            <h2 class="cake-title">Special Birthday Wish ❤️</h2>
+            
+            <div class="wish-container">
+                <div class="wish-text" id="wishText">
+                    Hii,
+                    Tu ne bola ki maine tera birthday bhool gaya... sach bolun to haan, bhool gaya tha.
+                    Lekin jaise hi maine tera status dekha, tab yaad aaya ki aaj tera birthday hai.
+                    Sach kahun to maine aisa kuch socha bhi nahi tha… lekin jab tune aaj mere liye bola ki "tujhe farak padta hai",
+                    maine kuch nahi bola... par sach mein, uss waqt tere aankhon mein woh pyaar tha jo dosti se zyada lag raha tha.
+
+                    Main friendship mein thoda weak hoon, yeh mujhe pata hai...
+                    Lekin tu to aage hai bhai, tere jaisa dosti nibhana sabke bas ki baat nahi.
+                    Kabhi kabhi tujhe dekh ke pyaar bhi feel ho jata hai…
+                    Tere jaisa dost shayad main kabhi na ban paun,
+                    par tera dost zarur ban ke rahunga.
+
+                    Aur sun,
+                    Happy Birthday bhai ❤️
+                    Mujhe mera khud ka birthday pasand nahi,
+                    lekin aaj main sach mein khush hoon,
+                    kyunki aaj ke din tu meri life mein aaya tha.
+
+                    Love you jaan 😍❤️❤️
+                </div>
+                
+                <div class="wish-signature">
+                    <div class="signature-name">Your Best Friend ❤️</div>
+                    <div style="color: rgba(255,255,255,0.7);">Always and Forever</div>
+                </div>
+            </div>
+            
+            <button class="app-btn" id="nextToGiftBtn">
+                Claim Your Gift <i class="fas fa-gift"></i>
+            </button>
+        </div>
+        
+        <!-- Gift Screen - UPDATED WITH NOTE -->
+        <div class="screen" id="giftScreen">
+            <h2 class="cake-title">Your Birthday Gift! 🎁</h2>
+            <p class="blow-instruction">Tap the gift box to reveal your special surprise</p>
+            
+            <div class="gift-box" id="giftBox">
+                <div class="gift-lid"></div>
+                <div class="gift-ribbon"></div>
+                <div class="gift-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+            </div>
+            
+            <div class="gift-code-section" id="giftCodeSection">
+                <div class="gift-code-title">Your Gift Card Code</div>
+                <!-- UPDATED CODE HERE -->
+                <div class="gift-code" id="giftCode">99GDEM3ZJ4X4CR4J</div>
+                
+                <!-- UPDATED GIFT NOTE -->
+                <div class="gift-note">
+                    <div class="gift-note-title">🎮 BGMI Royal Pass</div>
+                    <div class="gift-note-text">
+                        Use this Google Play Gift Card to claim your BGMI Royal Pass in the Play Store. Enjoy gaming! 🎯
+                    </div>
+                </div>
+                
+                <button class="copy-btn" id="copyBtn">
+                    Copy Code <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            
+            <div class="final-message" id="finalMessage">
+                <p>Thank you for being such an amazing friend. May this birthday bring you endless joy, success in all your dreams, and all the happiness you deserve. You're truly special! ❤️</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-happy-birthday-to-you-443.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="correctSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="wrongSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="candleSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-candle-blow-737.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="photoSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-camera-shutter-click-1130.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="giftSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-new-item-game-notification-253.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="clickSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all screen elements
+            const passwordScreen = document.getElementById('passwordScreen');
+            const photoVideoScreen = document.getElementById('photoVideoScreen');
+            const cakeScreen = document.getElementById('cakeScreen');
+            const wishScreen = document.getElementById('wishScreen');
+            const giftScreen = document.getElementById('giftScreen');
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            // Get input and buttons
+            const passwordInput = document.getElementById('passwordInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const skipVideoBtn = document.getElementById('skipVideoBtn');
+            const nextToCakeBtn = document.getElementById('nextToCakeBtn');
+            const blowBtn = document.getElementById('blowBtn');
+            const flame = document.getElementById('flame');
+            const nextToGiftBtn = document.getElementById('nextToGiftBtn');
+            const giftBox = document.getElementById('giftBox');
+            const giftCodeSection = document.getElementById('giftCodeSection');
+            const giftCode = document.getElementById('giftCode');
+            const copyBtn = document.getElementById('copyBtn');
+            const finalMessage = document.getElementById('finalMessage');
+            const photoContainer = document.getElementById('photoContainer');
+            const videoName = document.getElementById('videoName');
+            const videoMessage = document.getElementById('videoMessage');
+            const wishText = document.getElementById('wishText');
+            
+            // Get audio elements
+            const bgMusic = document.getElementById('bgMusic');
+            const correctSound = document.getElementById('correctSound');
+            const wrongSound = document.getElementById('wrongSound');
+            const candleSound = document.getElementById('candleSound');
+            const photoSound = document.getElementById('photoSound');
+            const giftSound = document.getElementById('giftSound');
+            const clickSound = document.getElementById('clickSound');
+            
+            // Your images
+            const images = [
+                'https://iili.io/fTK9hLF.md.jpg',
+                'https://iili.io/fTK97se.md.jpg',
+                'https://iili.io/fTK9MmB.md.jpg',
+                'https://iili.io/fTK91dx.md.jpg',
+                'https://iili.io/fTK9wqg.md.jpg',
+                'https://iili.io/fTK9OrJ.md.jpg'
+            ];
+            
+            // Messages for photo video
+            const messages = [
+                "Beautiful memories with you ❤️",
+                "Your smile lights up every room ✨",
+                "Cherishing every moment together 🌟",
+                "You make every day special 💫",
+                "Friendship that lasts forever 💖",
+                "Happy Birthday my dear friend 🎉"
+            ];
+            
+            // Correct password
+            const correctPassword = "Ansarul Islam";
+            
+            // Variables
+            let currentPhotoIndex = 0;
+            let photoElements = [];
+            let videoInterval;
+            let isVideoPlaying = true;
+            let totalVideoDuration = 24000; // 24 seconds total (4 seconds per photo * 6 photos)
+            let videoStartTime;
+            
+            // Initialize app
+            function initApp() {
+                // Hide loading screen after 2 seconds
+                setTimeout(() => {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }, 2000);
+                
+                // Clear any auto-filled password
+                passwordInput.value = '';
+                
+                // Focus on password input
+                setTimeout(() => {
+                    passwordInput.focus();
+                }, 2500);
+                
+                // Preload images
+                preloadImages();
+            }
+            
+            // Preload all images
+            function preloadImages() {
+                images.forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                });
+            }
+            
+            // Check password
+            function checkPassword() {
+                const enteredPassword = passwordInput.value.trim();
+                
+                if (enteredPassword === '') {
+                    showError("Please enter the password");
+                    return;
+                }
+                
+                if (enteredPassword === correctPassword) {
+                    // Correct password
+                    playSound(correctSound);
+                    showError(""); // Clear error
+                    
+                    // Disable input and button
+                    passwordInput.disabled = true;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = "Opening... <i class='fas fa-spinner fa-spin'></i>";
+                    
+                    // Transition to photo video screen
+                    setTimeout(() => {
+                        passwordScreen.style.transform = 'translateX(-100%)';
+                        startPhotoVideo();
+                    }, 1500);
+                    
+                } else {
+                    // Wrong password
+                    playSound(wrongSound);
+                    showError("Incorrect password! Try 'Ansarul Islam'");
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    
+                    // Shake animation
+                    passwordInput.style.animation = 'none';
+                    setTimeout(() => {
+                        passwordInput.style.animation = 'shake 0.5s';
+                    }, 10);
+                }
+            }
+            
+            // Show error message
+            function showError(message) {
+                errorMessage.textContent = message;
+            }
+            
+            // Start photo video
+            function startPhotoVideo() {
+                photoVideoScreen.style.transform = 'translateX(0)';
+                
+                // Load photos
+                loadPhotos();
+                
+                // Start video
+                startVideo();
+                
+                // Play background music
+                bgMusic.volume = 0.6;
+                playSound(bgMusic);
+                
+                // Set video start time
+                videoStartTime = Date.now();
+                
+                // Show next button after video duration
+                setTimeout(() => {
+                    nextToCakeBtn.style.display = 'block';
+                    nextToCakeBtn.style.animation = 'fadeIn 1s forwards';
+                }, totalVideoDuration);
+            }
+            
+            // Load photos into container
+            function loadPhotos() {
+                photoContainer.innerHTML = '';
+                photoElements = [];
+                
+                images.forEach((src, index) => {
+                    const img = document.createElement('img');
+                    img.className = 'animated-photo';
+                    img.src = src;
+                    img.alt = `Memory ${index + 1}`;
+                    img.loading = 'eager';
+                    
+                    photoContainer.appendChild(img);
+                    photoElements.push(img);
+                });
+                
+                // Show first photo
+                if (photoElements[0]) {
+                    photoElements[0].classList.add('active');
+                    updateVideoMessage(0);
+                }
+            }
+            
+            // Start video autoplay
+            function startVideo() {
+                if (videoInterval) clearInterval(videoInterval);
+                
+                videoInterval = setInterval(() => {
+                    if (isVideoPlaying) {
+                        nextPhoto();
+                    }
+                }, 4000); // Change photo every 4 seconds
+            }
+            
+            // Show next photo
+            function nextPhoto() {
+                // Hide current photo
+                if (photoElements[currentPhotoIndex]) {
+                    photoElements[currentPhotoIndex].classList.remove('active');
+                }
+                
+                // Move to next photo
+                currentPhotoIndex = (currentPhotoIndex + 1) % images.length;
+                
+                // Show new photo
+                if (photoElements[currentPhotoIndex]) {
+                    photoElements[currentPhotoIndex].classList.add('active');
+                    updateVideoMessage(currentPhotoIndex);
+                    
+                    // Play photo sound
+                    playSound(photoSound);
+                }
+            }
+            
+            // Update video message
+            function updateVideoMessage(index) {
+                videoMessage.textContent = messages[index];
+                videoMessage.style.animation = 'none';
+                setTimeout(() => {
+                    videoMessage.style.animation = 'fadeIn 1s forwards';
+                }, 10);
+            }
+            
+            // Skip video
+            function skipVideo() {
+                // Stop video
+                clearInterval(videoInterval);
+                isVideoPlaying = false;
+                
+                // Show all photos briefly
+                photoElements.forEach((photo, index) => {
+                    setTimeout(() => {
+                        photo.classList.add('active');
+                        setTimeout(() => {
+                            photo.classList.remove('active');
+                        }, 200);
+                    }, index * 100);
+                });
+                
+                // Show next button
+                nextToCakeBtn.style.display = 'block';
+                nextToCakeBtn.style.animation = 'fadeIn 1s forwards';
+                
+                playSound(clickSound);
+            }
+            
+            // Go to cake screen
+            function goToCakeScreen() {
+                // Stop video and music
+                clearInterval(videoInterval);
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                
+                // Transition screens
+                photoVideoScreen.style.transform = 'translateX(-100%)';
+                cakeScreen.style.transform = 'translateX(0)';
+                
+                playSound(clickSound);
+            }
+            
+            // Blow candle
+            function blowCandle() {
+                // Disable button
+                blowBtn.disabled = true;
+                blowBtn.innerHTML = "Wish Granted! <i class='fas fa-check'></i>";
+                
+                // Play candle sound
+                playSound(candleSound);
+                
+                // Extinguish flame
+                flame.style.animation = 'none';
+                flame.style.opacity = '0';
+                flame.style.transform = 'translateX(-50%) scale(0.3)';
+                
+                // Create smoke effect
+                createSmokeEffect();
+                
+                // Create confetti
+                createConfetti(50);
+                
+                // Go to wish screen after delay
+                setTimeout(() => {
+                    cakeScreen.style.transform = 'translateX(-100%)';
+                    wishScreen.style.transform = 'translateX(0)';
+                    animateWishText();
+                }, 3000);
+            }
+            
+            // Create smoke effect
+            function createSmokeEffect() {
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const smoke = document.createElement('div');
+                        smoke.style.position = 'fixed';
+                        smoke.style.width = '30px';
+                        smoke.style.height = '30px';
+                        smoke.style.background = 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%)';
+                        smoke.style.borderRadius = '50%';
+                        smoke.style.left = '50%';
+                        smoke.style.top = '50%';
+                        smoke.style.transform = 'translate(-50%, -50%)';
+                        smoke.style.zIndex = '1000';
+                        smoke.style.pointerEvents = 'none';
+                        smoke.style.filter = 'blur(8px)';
+                        
+                        // Random direction
+                        const tx = Math.random() * 100 - 50;
+                        const ty = -100 - Math.random() * 50;
+                        smoke.style.setProperty('--tx', `${tx}px`);
+                        smoke.style.setProperty('--ty', `${ty}px`);
+                        
+                        document.body.appendChild(smoke);
+                        
+                        // Animate smoke
+                        const animation = smoke.animate([
+                            { 
+                                transform: 'translate(-50%, -50%) scale(0.5)', 
+                                opacity: 1 
+                            },
+                            { 
+                                transform: `translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(2)`, 
+                                opacity: 0 
+                            }
+                        ], {
+                            duration: 3000,
+                            easing: 'ease-out'
+                        });
+                        
+                        // Remove after animation
+                        animation.onfinish = () => smoke.remove();
+                    }, i * 100);
+                }
+            }
+            
+            // Animate wish text
+            function animateWishText() {
+                const text = wishText.textContent;
+                wishText.textContent = '';
+                
+                let i = 0;
+                function typeWriter() {
+                    if (i < text.length) {
+                        wishText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 30);
+                    }
+                }
+                
+                // Start typing after a delay
+                setTimeout(typeWriter, 500);
+            }
+            
+            // Go to gift screen
+            function goToGiftScreen() {
+                wishScreen.style.transform = 'translateX(-100%)';
+                giftScreen.style.transform = 'translateX(0)';
+                playSound(clickSound);
+            }
+            
+            // Open gift box
+            function openGiftBox() {
+                // Add animation class
+                giftBox.style.animation = 'pulse 0.5s';
+                
+                // Play gift sound
+                playSound(giftSound);
+                
+                // Show gift code after animation
+                setTimeout(() => {
+                    giftCodeSection.style.display = 'block';
+                    giftCodeSection.style.animation = 'fadeIn 1s forwards';
+                    
+                    // Show final message after delay
+                    setTimeout(() => {
+                        finalMessage.style.display = 'block';
+                        finalMessage.style.animation = 'fadeIn 1s forwards';
+                        
+                        // Create confetti
+                        createConfetti(100);
+                    }, 1000);
+                }, 500);
+                
+                // Remove click event
+                giftBox.style.pointerEvents = 'none';
+            }
+            
+            // Copy gift code
+            function copyGiftCode() {
+                navigator.clipboard.writeText(giftCode.textContent).then(() => {
+                    copyBtn.innerHTML = "Copied! <i class='fas fa-check'></i>";
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = "Copy Code <i class='fas fa-copy'></i>";
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+                
+                playSound(clickSound);
+            }
+            
+            // Create confetti
+            function createConfetti(count) {
+                const colors = ['#ff6b8b', '#ffd166', '#42a5f5', '#66bb6a'];
+                
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.style.position = 'fixed';
+                        confetti.style.width = '10px';
+                        confetti.style.height = '10px';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                        confetti.style.left = Math.random() * 100 + 'vw';
+                        confetti.style.top = '-10px';
+                        confetti.style.zIndex = '999';
+                        confetti.style.pointerEvents = 'none';
+                        
+                        document.body.appendChild(confetti);
+                        
+                        // Animate
+                        const animation = confetti.animate([
+                            { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                            { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                        ], {
+                            duration: Math.random() * 2000 + 1500,
+                            easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                        });
+                        
+                        // Remove after animation
+                        animation.onfinish = () => confetti.remove();
+                    }, i * 30);
+                }
+            }
+            
+            // Play sound
+            function playSound(audioElement) {
+                audioElement.currentTime = 0;
+                audioElement.play().catch(e => {
+                    console.log("Audio play failed:", e);
+                    // Ignore audio errors for mobile compatibility
+                });
+            }
+            
+            // Event Listeners
+            submitBtn.addEventListener('click', checkPassword);
+            
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+            
+            // Prevent paste on password input
+            passwordInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                showError("Please type the password, don't paste it");
+            });
+            
+            // Prevent copy/cut on password input
+            passwordInput.addEventListener('copy', function(e) {
+                e.preventDefault();
+            });
+            
+            passwordInput.addEventListener('cut', function(e) {
+                e.preventDefault();
+            });
+            
+            skipVideoBtn.addEventListener('click', skipVideo);
+            nextToCakeBtn.addEventListener('click', goToCakeScreen);
+            blowBtn.addEventListener('click', blowCandle);
+            nextToGiftBtn.addEventListener('click', goToGiftScreen);
+            giftBox.addEventListener('click', openGiftBox);
+            copyBtn.addEventListener('click', copyGiftCode);
+            
+            // Initialize app
+            initApp();
+        });
+    </script>
+</body>
+</html>
