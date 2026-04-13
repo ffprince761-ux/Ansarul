@@ -1,0 +1,78 @@
+============================================
+  QUICK APK BUILD - 2 MINUTE METHOD
+============================================
+
+SABSE EASY TARIKA (No commands needed):
+
+STEP 1: Expo.dev Pe Jao
+------------------------
+1. Browser mein khol: https://expo.dev
+2. Login karo (Google se bhi ho sakta hai)
+
+STEP 2: Project Select Karo
+---------------------------
+1. "Projects" pe click karo
+2. "binest" ya "binest-app" select karo
+3. Agar nahi hai toh "Create Project"
+
+STEP 3: Build Start Karo
+------------------------
+1. Left menu mein "Builds" click karo
+2. "New Build" button dabao
+3. Select: "Android"
+4. Select: "APK" (not AAB)
+5. Profile: "preview"
+6. "Build" button dabao
+
+STEP 4: Wait & Download
+-----------------------
+- Build time: 10-30 minutes
+- Email aayega jab ready ho
+- Ya "Builds" page pe check karo
+
+STEP 5: Download & Install
+--------------------------
+1. Download link se APK download karo
+2. Phone mein copy karo (USB/Bluetooth/WhatsApp)
+3. Phone pe click karo → Install
+4. "Unknown sources" ON karo agar pooche
+
+============================================
+  ALTERNATIVE: EAS CLI Commands
+============================================
+
+Agar terminal use karna hai toh:
+
+    cd C:\xampp\htdocs\binest\binest
+    npx eas-cli login
+    npx eas-cli build --platform android --profile preview
+
+Note: Iske liye Node.js sahi se install hona chahiye
+
+============================================
+  APK Install Ke Baad Test Karo
+============================================
+
+[ ] App open hota hai
+[ ] Login page dikhta hai  
+[ ] Login with: ffprince761@gmail.com
+[ ] Password se login karo
+[ ] Dashboard load hota hai
+[ ] Data tensemock.in se aa raha hai
+
+============================================
+  Koi Problem Aaye To?
+============================================
+
+1. Build fail ho raha hai?
+   → app.json check karo
+   → eas.json check karo
+
+2. APK install nahi ho raha?
+   → Settings > Security > Unknown Sources ON karo
+
+3. App crash ho raha hai?
+   → API URL check karo: https://tensemock.in/api
+   → Log check karo
+
+============================================

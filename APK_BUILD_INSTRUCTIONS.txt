@@ -1,0 +1,81 @@
+============================================
+    Binest APK Build Instructions
+============================================
+
+Your app is configured to use:
+Live API: https://tensemock.in/api
+
+============================================
+METHOD 1: EAS Cloud Build (Easiest)
+============================================
+
+1. Double-click: BUILD_APK.bat
+
+2. It will:
+   - Install dependencies
+   - Login to Expo (browser open hoga)
+   - Build APK in cloud
+   - Download link provide karega
+
+3. Build complete hone ke baad:
+   - Email aayega with download link
+   - Ya visit: https://expo.dev/builds
+
+4. APK download karke phone mein install karo
+
+Note: Internet connection required
+      Build time: 10-30 minutes
+
+============================================
+METHOD 2: Local Build (Faster)
+============================================
+
+Requirements:
+- Android Studio installed
+- Android SDK configured
+
+1. Double-click: BUILD_LOCAL_APK.bat
+
+2. APK location:
+   C:\xampp\htdocs\binest\binest\Binest-APK.apk
+
+============================================
+METHOD 3: Manual Commands
+============================================
+
+If batch files fail, run these:
+
+cd C:\xampp\htdocs\binest\binest
+
+npm install
+
+npx eas-cli login
+
+npx eas-cli build --platform android --profile preview
+
+============================================
+PHONE PE INSTALL KARNE KE LIYE
+============================================
+
+1. APK file phone mein copy karo
+   (USB cable ya WhatsApp/Email se)
+
+2. Phone mein click karo:
+   "Install"
+
+3. Agar "Unknown source" error aaye:
+   Settings > Security > Unknown Sources > ON
+
+4. App open karo!
+
+============================================
+TEST CHECKLIST
+============================================
+
+[ ] App open hota hai
+[ ] Login page dikhta hai
+[ ] Login kaam karta hai
+[ ] Dashboard load hota hai
+[ ] API se data aa raha hai
+
+============================================

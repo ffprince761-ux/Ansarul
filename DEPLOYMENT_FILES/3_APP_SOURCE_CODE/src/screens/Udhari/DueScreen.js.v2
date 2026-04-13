@@ -1,0 +1,471 @@
+import React, { useContext, useMemo, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert, Linking, Modal } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { AppContext } from '../../context/AppContext';
+import { getDuePayments } from '../../services/api';
+
+const DueScreen = ({ navigation }) => {
+  const { bills, updateDueStatus, addDuePayment } = useContext(AppContext);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedBill, setSelectedBill] = useState(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentNote, setPaymentNote] = useState('');
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [historyBill, setHistoryBill] = useState(null);
+
+  const dueBills = useMemo(() => {
+    const safeBills = bills || [];
+    return safeBills.filter(bill => {
+      const mode = (bill.payment_mode || bill.paymentMode || '').toLowerCase();
+      return mode === 'due';
+    });
+  }, [bills]);
+
+  const filteredBills = useMemo(() => {
+    let filtered = dueBills;
+    if (filter === 'unpaid') {
+      filtered = filtered.filter(b => b.due_status === 'unpaid');
+    } else if (filter === 'partial') {
+      filtered = filtered.filter(b => b.due_status === 'partial');
+    } else if (filter === 'paid') {
+      filtered = filtered.filter(b => b.due_status === 'paid');
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(b =>
+        (b.customer_name || b.customerName || '').toLowerCase().includes(q) ||
+        (b.customer_mobile || b.customerMobile || '').includes(q)
+      );
+    }
+    return filtered.sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
+  }, [dueBills, filter, searchQuery]);
+
+  const stats = useMemo(() => {
+    const totalDue = dueBills.reduce((sum, b) => sum + (parseFloat(b.grand_total || b.grandTotal || b.total) || 0), 0);
+    const totalPaid = dueBills.reduce((sum, b) => sum + (parseFloat(b.paid_amount) || 0), 0);
+    const totalPending = totalDue - totalPaid;
+    const unpaidCount = dueBills.filter(b => b.due_status !== 'paid').length;
+    const paidCount = dueBills.filter(b => b.due_status === 'paid').length;
+    return { totalDue, totalPaid, totalPending, unpaidCount, paidCount };
+  }, [dueBills]);
+
+  const openPaymentModal = (bill) => {
+    setSelectedBill(bill);
+    setPaymentAmount('');
+    setPaymentNote('');
+    setShowPaymentModal(true);
+  };
+
+  const handleAddPayment = async () => {
+    const amount = parseFloat(paymentAmount);
+    if (!amount || amount <= 0) {
+      Alert.alert('Error', 'Please enter a valid amount');
+      return;
+    }
+    const total = parseFloat(selectedBill.grand_total || selectedBill.grandTotal || selectedBill.total) || 0;
+    const paid = parseFloat(selectedBill.paid_amount) || 0;
+    const remaining = total - paid;
+
+    if (amount > remaining) {
+      Alert.alert('Error', `Amount exceeds remaining ₹${remaining.toLocaleString('en-IN')}`);
+      return;
+    }
+
+    const result = await addDuePayment(selectedBill.id, amount, paymentNote);
+    if (result && result.success) {
+      setShowPaymentModal(false);
+      const statusMsg = result.due_status === 'paid' ? 'Fully Paid!' : `₹${amount} recorded. Remaining: ₹${result.remaining.toLocaleString('en-IN')}`;
+      Alert.alert('Payment Recorded', statusMsg);
+    } else {
+      Alert.alert('Error', result?.error || 'Failed to record payment');
+    }
+  };
+
+  const handleMarkFullPaid = (bill) => {
+    const total = parseFloat(bill.grand_total || bill.grandTotal || bill.total) || 0;
+    const paid = parseFloat(bill.paid_amount) || 0;
+    const remaining = total - paid;
+    const name = bill.customer_name || bill.customerName || 'Customer';
+
+    Alert.alert('Mark Full Paid', `Pay remaining ₹${remaining.toLocaleString('en-IN')} from ${name}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Full Paid', onPress: async () => {
+        const result = await addDuePayment(bill.id, remaining, 'Full payment');
+        if (result?.success) Alert.alert('Done', 'Marked as fully paid!');
+        else Alert.alert('Error', result?.error || 'Failed');
+      }}
+    ]);
+  };
+
+  const openPaymentHistory = async (bill) => {
+    setHistoryBill(bill);
+    setPaymentHistory([]);
+    setShowHistoryModal(true);
+    const res = await getDuePayments(bill.id);
+    if (res?.success) setPaymentHistory(res.payments || []);
+  };
+
+  const handleCall = (phone) => {
+    if (phone) Linking.openURL(`tel:${phone}`);
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    try {
+      return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch { return dateStr; }
+  };
+
+  const parseItems = (items) => {
+    if (!items) return [];
+    if (Array.isArray(items)) return items;
+    try { return JSON.parse(items); } catch { return []; }
+  };
+
+  const getStatusColor = (status) => {
+    if (status === 'paid') return '#10B981';
+    if (status === 'partial') return '#F59E0B';
+    return '#DC2626';
+  };
+
+  const getStatusLabel = (status) => {
+    if (status === 'paid') return 'Paid';
+    if (status === 'partial') return 'Partial';
+    return 'Unpaid';
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <LinearGradient colors={['#DC2626', '#991B1B']} style={styles.header}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Due / Udhari</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statAmount}>₹{Math.round(stats.totalPending).toLocaleString('en-IN')}</Text>
+            <Text style={styles.statLabel}>Pending ({stats.unpaidCount})</Text>
+          </View>
+          <View style={[styles.statBox, styles.statBoxMiddle]}>
+            <Text style={styles.statAmount}>₹{Math.round(stats.totalPaid).toLocaleString('en-IN')}</Text>
+            <Text style={styles.statLabel}>Received ({stats.paidCount})</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statAmount}>₹{Math.round(stats.totalDue).toLocaleString('en-IN')}</Text>
+            <Text style={styles.statLabel}>Total Due</Text>
+          </View>
+        </View>
+      </LinearGradient>
+
+      <View style={styles.searchBar}>
+        <Ionicons name="search" size={20} color="#94A3B8" />
+        <TextInput style={styles.searchInput} placeholder="Search customer name or phone..." placeholderTextColor="#94A3B8" value={searchQuery} onChangeText={setSearchQuery} />
+      </View>
+
+      <View style={styles.filterRow}>
+        {['all', 'unpaid', 'partial', 'paid'].map(f => (
+          <TouchableOpacity key={f} style={[styles.filterButton, filter === f && styles.filterButtonActive]} onPress={() => setFilter(f)}>
+            <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
+              {f === 'all' ? 'All' : f === 'unpaid' ? 'Unpaid' : f === 'partial' ? 'Partial' : 'Paid'}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {filteredBills.length > 0 ? filteredBills.map((bill, index) => {
+          const total = parseFloat(bill.grand_total || bill.grandTotal || bill.total) || 0;
+          const paid = parseFloat(bill.paid_amount) || 0;
+          const remaining = total - paid;
+          const progress = total > 0 ? (paid / total) * 100 : 0;
+          const status = bill.due_status || 'unpaid';
+          const customerName = bill.customer_name || bill.customerName || 'Customer';
+          const customerPhone = bill.customer_mobile || bill.customerMobile || '';
+          const billItems = parseItems(bill.items);
+
+          return (
+            <View key={bill.id || index} style={styles.dueCard}>
+              {/* Header */}
+              <View style={styles.dueCardHeader}>
+                <View style={styles.customerInfo}>
+                  <View style={[styles.avatar, { backgroundColor: status === 'paid' ? '#D1FAE5' : status === 'partial' ? '#FEF3C7' : '#FEE2E2' }]}>
+                    <Ionicons name="person" size={20} color={getStatusColor(status)} />
+                  </View>
+                  <View style={styles.customerDetails}>
+                    <Text style={styles.customerName}>{customerName}</Text>
+                    {customerPhone ? (
+                      <TouchableOpacity onPress={() => handleCall(customerPhone)}>
+                        <Text style={styles.customerPhone}><Ionicons name="call" size={11} color="#2563EB" /> {customerPhone}</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                </View>
+                <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(status)}20` }]}>
+                  <Text style={[styles.statusText, { color: getStatusColor(status) }]}>{getStatusLabel(status)}</Text>
+                </View>
+              </View>
+
+              {/* Amount + Progress */}
+              <View style={styles.amountSection}>
+                <View style={styles.amountRow}>
+                  <Text style={styles.amountLabel}>Total</Text>
+                  <Text style={styles.amountValue}>₹{total.toLocaleString('en-IN')}</Text>
+                </View>
+                <View style={styles.amountRow}>
+                  <Text style={styles.amountLabel}>Paid</Text>
+                  <Text style={[styles.amountValue, { color: '#10B981' }]}>₹{paid.toLocaleString('en-IN')}</Text>
+                </View>
+                <View style={styles.amountRow}>
+                  <Text style={[styles.amountLabel, { fontWeight: 'bold' }]}>Remaining</Text>
+                  <Text style={[styles.amountValue, { color: '#DC2626', fontWeight: 'bold' }]}>₹{remaining.toLocaleString('en-IN')}</Text>
+                </View>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progressFill, { width: `${Math.min(progress, 100)}%`, backgroundColor: getStatusColor(status) }]} />
+                </View>
+                <Text style={styles.progressText}>{Math.round(progress)}% paid</Text>
+              </View>
+
+              {/* Info */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Date: {formatDate(bill.date || bill.created_at)}</Text>
+                {bill.invoice_number && <Text style={styles.infoLabel}>Invoice: #{bill.invoice_number}</Text>}
+              </View>
+
+              {/* Items */}
+              {billItems.length > 0 && (
+                <View style={styles.itemsSection}>
+                  <Text style={styles.itemsTitle}>Items:</Text>
+                  {billItems.slice(0, 3).map((item, i) => (
+                    <Text key={i} style={styles.itemText}>• {item.name} x{item.quantity} — ₹{((parseFloat(item.price) || 0) * (item.quantity || 1)).toLocaleString('en-IN')}</Text>
+                  ))}
+                  {billItems.length > 3 && <Text style={styles.itemText}>+{billItems.length - 3} more</Text>}
+                </View>
+              )}
+
+              {/* Actions */}
+              <View style={styles.actionRow}>
+                {status !== 'paid' && (
+                  <>
+                    <TouchableOpacity style={styles.partialPayBtn} onPress={() => openPaymentModal(bill)}>
+                      <Ionicons name="cash" size={16} color="#FFFFFF" />
+                      <Text style={styles.partialPayText}>Add Payment</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.fullPayBtn} onPress={() => handleMarkFullPaid(bill)}>
+                      <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                      <Text style={styles.fullPayText}>Full Pay</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+                <TouchableOpacity style={styles.historyBtn} onPress={() => openPaymentHistory(bill)}>
+                  <Ionicons name="time" size={16} color="#2563EB" />
+                  <Text style={styles.historyBtnText}>History</Text>
+                </TouchableOpacity>
+                {customerPhone ? (
+                  <TouchableOpacity style={styles.callBtn} onPress={() => handleCall(customerPhone)}>
+                    <Ionicons name="call" size={16} color="#2563EB" />
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
+          );
+        }) : (
+          <View style={styles.emptyState}>
+            <Ionicons name="receipt-outline" size={60} color="#CBD5E1" />
+            <Text style={styles.emptyTitle}>No Due Bills</Text>
+            <Text style={styles.emptyText}>{filter !== 'all' ? 'No bills match this filter' : 'Create a bill with "Due" payment method to track here'}</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Add Payment Modal */}
+      <Modal visible={showPaymentModal} transparent animationType="slide" onRequestClose={() => setShowPaymentModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add Payment</Text>
+              <TouchableOpacity onPress={() => setShowPaymentModal(false)}>
+                <Ionicons name="close" size={24} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+            {selectedBill && (
+              <>
+                <Text style={styles.modalCustomer}>{selectedBill.customer_name || selectedBill.customerName}</Text>
+                <View style={styles.modalAmountInfo}>
+                  <View style={styles.modalAmountRow}>
+                    <Text style={styles.modalAmountLabel}>Total Due</Text>
+                    <Text style={styles.modalAmountValue}>₹{(parseFloat(selectedBill.grand_total || selectedBill.grandTotal || selectedBill.total) || 0).toLocaleString('en-IN')}</Text>
+                  </View>
+                  <View style={styles.modalAmountRow}>
+                    <Text style={styles.modalAmountLabel}>Already Paid</Text>
+                    <Text style={[styles.modalAmountValue, { color: '#10B981' }]}>₹{(parseFloat(selectedBill.paid_amount) || 0).toLocaleString('en-IN')}</Text>
+                  </View>
+                  <View style={[styles.modalAmountRow, { borderTopWidth: 1, borderTopColor: '#E2E8F0', paddingTop: 8 }]}>
+                    <Text style={[styles.modalAmountLabel, { fontWeight: 'bold' }]}>Remaining</Text>
+                    <Text style={[styles.modalAmountValue, { color: '#DC2626', fontWeight: 'bold' }]}>
+                      ₹{((parseFloat(selectedBill.grand_total || selectedBill.grandTotal || selectedBill.total) || 0) - (parseFloat(selectedBill.paid_amount) || 0)).toLocaleString('en-IN')}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.inputLabel}>Payment Amount (₹)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter amount..."
+                  keyboardType="numeric"
+                  value={paymentAmount}
+                  onChangeText={setPaymentAmount}
+                  autoFocus
+                />
+                <Text style={styles.inputLabel}>Note (optional)</Text>
+                <TextInput
+                  style={[styles.input, { height: 60 }]}
+                  placeholder="e.g. Partial cash payment..."
+                  value={paymentNote}
+                  onChangeText={setPaymentNote}
+                  multiline
+                />
+                <View style={styles.quickAmounts}>
+                  {(() => {
+                    const remaining = (parseFloat(selectedBill.grand_total || selectedBill.grandTotal || selectedBill.total) || 0) - (parseFloat(selectedBill.paid_amount) || 0);
+                    const amounts = [500, 1000, 2000, 5000].filter(a => a <= remaining);
+                    if (remaining > 0 && !amounts.includes(Math.round(remaining))) amounts.push(Math.round(remaining));
+                    return amounts.sort((a, b) => a - b).slice(0, 4).map(amt => (
+                      <TouchableOpacity key={amt} style={styles.quickAmountBtn} onPress={() => setPaymentAmount(String(amt))}>
+                        <Text style={styles.quickAmountText}>₹{amt.toLocaleString('en-IN')}</Text>
+                      </TouchableOpacity>
+                    ));
+                  })()}
+                </View>
+                <TouchableOpacity style={styles.submitBtn} onPress={handleAddPayment}>
+                  <Text style={styles.submitBtnText}>Record Payment</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Payment History Modal */}
+      <Modal visible={showHistoryModal} transparent animationType="slide" onRequestClose={() => setShowHistoryModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Payment History</Text>
+              <TouchableOpacity onPress={() => setShowHistoryModal(false)}>
+                <Ionicons name="close" size={24} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+            {historyBill && (
+              <Text style={styles.modalCustomer}>{historyBill.customer_name || historyBill.customerName} — ₹{(parseFloat(historyBill.grand_total || historyBill.grandTotal || historyBill.total) || 0).toLocaleString('en-IN')}</Text>
+            )}
+            <ScrollView style={{ maxHeight: 350 }}>
+              {paymentHistory.length > 0 ? paymentHistory.map((p, i) => (
+                <View key={p.id || i} style={styles.historyItem}>
+                  <View style={styles.historyDot} />
+                  <View style={styles.historyContent}>
+                    <View style={styles.historyRow}>
+                      <Text style={styles.historyAmount}>₹{(parseFloat(p.amount) || 0).toLocaleString('en-IN')}</Text>
+                      <Text style={styles.historyDate}>{formatDate(p.payment_date)}</Text>
+                    </View>
+                    {p.note ? <Text style={styles.historyNote}>{p.note}</Text> : null}
+                  </View>
+                </View>
+              )) : (
+                <View style={{ padding: 30, alignItems: 'center' }}>
+                  <Ionicons name="document-text-outline" size={40} color="#CBD5E1" />
+                  <Text style={{ color: '#94A3B8', marginTop: 8 }}>No payments recorded yet</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  backButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF' },
+  statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  statBox: { flex: 1, alignItems: 'center' },
+  statBoxMiddle: { borderLeftWidth: 1, borderRightWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  statAmount: { fontSize: 16, fontWeight: 'bold', color: '#FFFFFF' },
+  statLabel: { fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', marginHorizontal: 20, marginTop: 16, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, elevation: 2 },
+  searchInput: { flex: 1, marginLeft: 10, fontSize: 14, color: '#1E293B' },
+  filterRow: { flexDirection: 'row', paddingHorizontal: 20, marginTop: 12, marginBottom: 8 },
+  filterButton: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#E2E8F0', marginRight: 8 },
+  filterButtonActive: { backgroundColor: '#DC2626' },
+  filterText: { fontSize: 13, fontWeight: '600', color: '#64748B' },
+  filterTextActive: { color: '#FFFFFF' },
+  content: { flex: 1, padding: 20 },
+  dueCard: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16, marginBottom: 12, elevation: 3 },
+  dueCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  customerInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  avatar: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  customerDetails: { flex: 1 },
+  customerName: { fontSize: 16, fontWeight: '600', color: '#1E293B' },
+  customerPhone: { fontSize: 13, color: '#2563EB', marginTop: 2 },
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  statusText: { fontSize: 12, fontWeight: 'bold' },
+  amountSection: { backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, marginBottom: 10 },
+  amountRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  amountLabel: { fontSize: 13, color: '#64748B' },
+  amountValue: { fontSize: 14, fontWeight: '600', color: '#1E293B' },
+  progressBar: { height: 8, backgroundColor: '#E2E8F0', borderRadius: 4, marginTop: 8, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 4 },
+  progressText: { fontSize: 11, color: '#94A3B8', marginTop: 4, textAlign: 'right' },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  infoLabel: { fontSize: 12, color: '#64748B' },
+  itemsSection: { borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 8, marginBottom: 8 },
+  itemsTitle: { fontSize: 12, fontWeight: 'bold', color: '#64748B', marginBottom: 4 },
+  itemText: { fontSize: 12, color: '#64748B', marginBottom: 2 },
+  actionRow: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 12 },
+  partialPayBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#2563EB', paddingVertical: 10, borderRadius: 10, marginRight: 6 },
+  partialPayText: { color: '#FFFFFF', fontWeight: '600', fontSize: 13, marginLeft: 4 },
+  fullPayBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1FAE5', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, marginRight: 6 },
+  fullPayText: { color: '#10B981', fontWeight: '600', fontSize: 13, marginLeft: 4 },
+  historyBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#EFF6FF', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, marginRight: 6 },
+  historyBtnText: { color: '#2563EB', fontWeight: '600', fontSize: 13, marginLeft: 4 },
+  callBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#EFF6FF', justifyContent: 'center', alignItems: 'center' },
+  emptyState: { alignItems: 'center', paddingTop: 60 },
+  emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#94A3B8', marginTop: 16 },
+  emptyText: { fontSize: 14, color: '#CBD5E1', marginTop: 8, textAlign: 'center' },
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '85%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', color: '#1E293B' },
+  modalCustomer: { fontSize: 16, fontWeight: '600', color: '#64748B', marginBottom: 16 },
+  modalAmountInfo: { backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, marginBottom: 16 },
+  modalAmountRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+  modalAmountLabel: { fontSize: 14, color: '#64748B' },
+  modalAmountValue: { fontSize: 14, fontWeight: '600', color: '#1E293B' },
+  inputLabel: { fontSize: 14, fontWeight: '600', color: '#1E293B', marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 12, padding: 14, fontSize: 16, color: '#1E293B', marginBottom: 12, backgroundColor: '#F8FAFC' },
+  quickAmounts: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 },
+  quickAmountBtn: { backgroundColor: '#EFF6FF', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginRight: 8, marginBottom: 8 },
+  quickAmountText: { color: '#2563EB', fontWeight: '600', fontSize: 13 },
+  submitBtn: { backgroundColor: '#2563EB', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
+  submitBtnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16 },
+  // History
+  historyItem: { flexDirection: 'row', marginBottom: 12, alignItems: 'flex-start' },
+  historyDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#10B981', marginTop: 5, marginRight: 12 },
+  historyContent: { flex: 1, borderBottomWidth: 1, borderBottomColor: '#F1F5F9', paddingBottom: 12 },
+  historyRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  historyAmount: { fontSize: 16, fontWeight: 'bold', color: '#10B981' },
+  historyDate: { fontSize: 13, color: '#64748B' },
+  historyNote: { fontSize: 12, color: '#94A3B8', marginTop: 4 },
+});
+
+export default DueScreen;

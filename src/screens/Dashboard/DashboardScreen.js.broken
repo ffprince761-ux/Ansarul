@@ -1,0 +1,774 @@
+import React, { useContext, useMemo, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { SimpleAppContext } from '../../context/SimpleAppContext';
+import { useSimpleLoading } from '../../contexts/SimpleLoadingContext';
+import { useNavigation } from '@react-navigation/native';
+
+const DashboardScreen = () => {
+  const { user, sales, expenses, products, bills } = useContext(SimpleAppContext);
+  const navigation = useNavigation();
+  const { showLoading, hideLoading } = useSimpleLoading();
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      showLoading('Loading dashboard data...');
+      
+      // Simulate data loading
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('Dashboard data loaded');
+    } catch (error) {
+      console.error('Dashboard loading error:', error);
+    } finally {
+      hideLoading();
+    }
+  };
+
+  const handleBillingPress = () => {
+    showLoading('Opening billing...');
+    setTimeout(() => {
+      hideLoading();
+      navigation.navigate('Billing');
+    }, 1000);
+  };
+
+  const handleInventoryPress = () => {
+    showLoading('Loading inventory...');
+    setTimeout(() => {
+      hideLoading();
+      navigation.navigate('Inventory');
+    }, 1000);
+  };
+
+  const handleCustomersPress = () => {
+    showLoading('Loading customers...');
+    setTimeout(() => {
+      hideLoading();
+      navigation.navigate('Customers');
+    }, 1000);
+  };
+
+  const handleReportsPress = () => {
+    showLoading('Generating reports...');
+    setTimeout(() => {
+      hideLoading();
+      navigation.navigate('Reports');
+    }, 1000);
+  };
+
+  const todayStats = useMemo(() => {
+    const today = new Date().toDateString();
+    const safeSales = sales || [];
+    const safeExpenses = expenses || [];
+    
+    const todaySales = safeSales.filter(sale => 
+      new Date(sale.date).toDateString() === today
+    );
+    
+    const todayExpenses = safeExpenses.filter(expense => 
+      new Date(expense.date).toDateString() === today
+    );
+    
+    return {
+      todaySales: todaySales.reduce((sum, sale) => sum + (sale.total || 0), 0),
+      todayExpenses: todayExpenses.reduce((sum, expense) => sum + (expense.amount || 0), 0),
+      todayOrders: todaySales.length,
+      todayCustomers: todaySales.length
+    };
+  }, [sales, expenses]);
+
+  const totalStats = useMemo(() => {
+    const safeSales = sales || [];
+    const safeExpenses = expenses || [];
+    
+    return {
+      totalRevenue: safeSales.reduce((sum, sale) => sum + (sale.total || 0), 0),
+      totalExpenses: safeExpenses.reduce((sum, expense) => sum + (expense.amount || 0), 0),
+      totalOrders: safeSales.length,
+      totalProducts: products?.length || 0,
+      totalCustomers: bills?.length || 0
+    };
+  }, [sales, expenses, products, bills]);
+
+  const profit = totalStats.totalRevenue - totalStats.totalExpenses;
+  const profitMargin = totalStats.totalRevenue > 0 ? (profit / totalStats.totalRevenue) * 100 : 0;
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#2563EB', '#1E40AF']}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.userName}>{user?.name || 'User'}</Text>
+          </View>
+          <TouchableOpacity style={styles.notificationButton}>
+            <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <Ionicons name="cash-outline" size={24} color="#2563EB" />
+            </View>
+            <Text style={styles.statValue}>₹{totalStats.totalRevenue.toFixed(2)}</Text>
+            <Text style={styles.statLabel}>Total Revenue</Text>
+            <Text style={styles.statSubtext}>₹{todayStats.todaySales.toFixed(2)} today</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <Ionicons name="trending-up-outline" size={24} color="#10B981" />
+            </View>
+            <Text style={styles.statValue}>₹{profit.toFixed(2)}</Text>
+            <Text style={styles.statLabel}>Total Profit</Text>
+            <Text style={styles.statSubtext}>{profitMargin.toFixed(1)}% margin</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <Ionicons name="receipt-outline" size={24} color="#F59E0B" />
+            </View>
+            <Text style={styles.statValue}>₹{totalStats.totalExpenses.toFixed(2)}</Text>
+            <Text style={styles.statLabel}>Total Expenses</Text>
+            <Text style={styles.statSubtext}>₹{todayStats.todayExpenses.toFixed(2)} today</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={styles.statIcon}>
+              <Ionicons name="people-outline" size={24} color="#8B5CF6" />
+            </View>
+            <Text style={styles.statValue}>{totalStats.totalCustomers}</Text>
+            <Text style={styles.statLabel}>Total Customers</Text>
+            <Text style={styles.statSubtext}>{todayStats.todayOrders} active today</Text>
+          </View>
+        </View>
+
+        <View style={styles.quickActions}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.actionGrid}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={handleBillingPress}
+            >
+              <Ionicons name="add-circle-outline" size={32} color="#2563EB" />
+              <Text style={styles.actionText}>New Bill</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={handleInventoryPress}
+            >
+              <Ionicons name="cube-outline" size={32} color="#2563EB" />
+              <Text style={styles.actionText}>Products</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={handleCustomersPress}
+            >
+              <Ionicons name="person-add-outline" size={32} color="#2563EB" />
+              <Text style={styles.actionText}>Add Customer</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={handleReportsPress}
+            >
+              <Ionicons name="bar-chart-outline" size={32} color="#2563EB" />
+              <Text style={styles.actionText}>Reports</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    paddingTop: 20,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    opacity: 0.8,
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  notificationButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  statCard: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  statIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f0f9ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1E293B',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#64748B',
+    marginBottom: 4,
+  },
+  statSubtext: {
+    fontSize: 12,
+    color: '#94A3B8',
+  },
+  quickActions: {
+    marginBottom: 24,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  actionButton: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E293B',
+    marginTop: 8,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1E293B',
+    marginBottom: 16,
+  },
+});
+
+export default DashboardScreen;
+              <View style={[styles.miniChart, { 
+                height: todayStats.totalSales > 0 ? `${Math.min((todayStats.totalSales / 10000) * 100, 100)}%` : '5%',
+                backgroundColor: 'rgba(255, 255, 255, 0.3)'
+              }]} />
+            </View>
+          </LinearGradient>
+
+          <LinearGradient
+            colors={['#F59E0B', '#D97706']}
+            style={styles.statCard}
+          >
+            <View style={styles.statHeader}>
+              <Text style={styles.statLabel} numberOfLines={1}>Expenses</Text>
+              <View style={styles.badge}>
+                <Ionicons name="trending-down" size={12} color="#F59E0B" />
+                <Text style={styles.badgeText}>{todayStats.expensePercentage}%</Text>
+              </View>
+            </View>
+            <Text style={styles.statValue}>₹ {todayStats.totalExpenses.toLocaleString()}</Text>
+            <View style={styles.chartPlaceholder}>
+              <View style={[styles.miniChart, { 
+                height: todayStats.totalExpenses > 0 ? `${Math.min((todayStats.totalExpenses / 10000) * 100, 100)}%` : '5%',
+                backgroundColor: 'rgba(255, 255, 255, 0.3)'
+              }]} />
+            </View>
+          </LinearGradient>
+
+          <LinearGradient
+            colors={['#06B6D4', '#0891B2']}
+            style={styles.statCard}
+          >
+            <View style={styles.statHeader}>
+              <Text style={styles.statLabel} numberOfLines={1}>Profit</Text>
+              <View style={styles.badge}>
+                <Ionicons name="trending-up" size={12} color="#06B6D4" />
+                <Text style={styles.badgeText}>{todayStats.profitPercentage}%</Text>
+              </View>
+            </View>
+            <Text style={styles.statValue}>₹ {todayStats.profit.toLocaleString()}</Text>
+            <View style={styles.chartPlaceholder}>
+              <View style={[styles.miniChart, { 
+                height: Math.abs(todayStats.profit) > 0 ? `${Math.min((Math.abs(todayStats.profit) / 10000) * 100, 100)}%` : '5%',
+                backgroundColor: todayStats.profit >= 0 ? 'rgba(255, 255, 255, 0.3)' : 'rgba(239, 68, 68, 0.3)'
+              }]} />
+            </View>
+          </LinearGradient>
+        </View>
+
+        {lowStockProducts > 0 && (
+          <TouchableOpacity style={styles.alertCard}>
+            <View style={styles.alertIcon}>
+              <Ionicons name="warning" size={24} color="#F59E0B" />
+            </View>
+            <View style={styles.alertContent}>
+              <Text style={styles.alertTitle}>Low Stock Alert</Text>
+              <Text style={styles.alertText}>{lowStockProducts} products running low</Text>
+            </View>
+            <View style={styles.alertBadge}>
+              <Text style={styles.alertBadgeText}>{lowStockProducts}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <TouchableOpacity>
+            <Ionicons name="chevron-forward" size={20} color="#64748B" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.activityList}>
+          {recentActivity.length > 0 ? (
+            recentActivity.map((activity, index) => {
+              const isBill = activity.type === 'bill';
+              const isSale = activity.type === 'sale';
+              const isExpense = activity.type === 'expense';
+              
+              return (
+                <View key={index} style={styles.activityItem}>
+                  <View style={[
+                    styles.activityIcon,
+                    { backgroundColor: isBill ? '#D1FAE5' : isSale ? '#DBEAFE' : '#FEE2E2' }
+                  ]}>
+                    <Ionicons 
+                      name={isBill ? 'receipt' : isSale ? 'cart' : 'wallet'} 
+                      size={20} 
+                      color={isBill ? '#10B981' : isSale ? '#2563EB' : '#EF4444'} 
+                    />
+                  </View>
+                  <View style={styles.activityContent}>
+                    <Text style={styles.activityTitle}>
+                      {isBill ? `Bill - ${activity.customer_name || activity.customerName || 'Customer'}` : activity.customerName || activity.category || 'Transaction'}
+                    </Text>
+                    <Text style={styles.activityTime}>
+                      {new Date(activity.date).toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </Text>
+                  </View>
+                  <Text style={[
+                    styles.activityAmount,
+                    { color: isExpense ? '#EF4444' : '#10B981' }
+                  ]}>
+                    {isExpense ? '-' : '+'}₹{parseFloat(activity.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </Text>
+                </View>
+              );
+            })
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>No recent activity</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.quickActions}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.actionGrid}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => navigation.navigate('Billing')}
+            >
+              <LinearGradient
+                colors={['#2563EB', '#1E40AF']}
+                style={styles.actionGradient}
+              >
+                <Ionicons name="receipt" size={24} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={styles.actionText}>Create Bill</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => navigation.navigate('Inventory', { 
+                screen: 'AddProduct'
+              })}
+            >
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                style={styles.actionGradient}
+              >
+                <Ionicons name="add-circle" size={24} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={styles.actionText}>Add Product</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => navigation.navigate('Expense')}
+            >
+              <LinearGradient
+                colors={['#F59E0B', '#D97706']}
+                style={styles.actionGradient}
+              >
+                <Ionicons name="wallet" size={24} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={styles.actionText}>Add Expense</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => navigation.navigate('Customers', { 
+                screen: 'AddCustomer'
+              })}
+            >
+              <LinearGradient
+                colors={['#8B5CF6', '#7C3AED']}
+                style={styles.actionGradient}
+              >
+                <Ionicons name="person-add" size={24} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={styles.actionText}>Add Customer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  greeting: {
+    fontSize: 14,
+    color: '#E0E7FF',
+  },
+  businessName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 4,
+  },
+  notificationButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: '#EF4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#2563EB',
+  },
+  notificationBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  statsContainer: {
+    marginBottom: 20,
+  },
+  statCard: {
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 12,
+  },
+  statHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.9,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 4,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  chartPlaceholder: {
+    height: 40,
+    justifyContent: 'flex-end',
+    marginTop: 8,
+  },
+  miniChart: {
+    borderRadius: 4,
+    width: '100%',
+  },
+  alertCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  alertIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  alertContent: {
+    flex: 1,
+  },
+  alertTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#92400E',
+    marginBottom: 2,
+  },
+  alertText: {
+    fontSize: 12,
+    color: '#92400E',
+  },
+  alertBadge: {
+    backgroundColor: '#F59E0B',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1E293B',
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  chartSection: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  salesChart: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 180,
+    paddingTop: 20,
+  },
+  chartBar: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  barContainer: {
+    width: '100%',
+    height: 120,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  bar: {
+    width: '80%',
+    borderRadius: 6,
+    minHeight: 4,
+  },
+  barLabel: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 8,
+    fontWeight: '500',
+  },
+  barAmount: {
+    fontSize: 10,
+    color: '#2563EB',
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  activityList: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E293B',
+    marginBottom: 2,
+  },
+  activityTime: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  activityAmount: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  emptyState: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: '#94A3B8',
+  },
+  quickActions: {
+    marginBottom: 20,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  actionButton: {
+    width: '48%',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  actionGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  actionText: {
+    fontSize: 12,
+    color: '#64748B',
+    textAlign: 'center',
+  },
+});
+
+export default DashboardScreen;

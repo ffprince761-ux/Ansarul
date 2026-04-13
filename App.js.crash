@@ -1,0 +1,141 @@
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, StyleSheet, Text, Button } from 'react-native';
+import { Provider as PaperProvider } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SmartLoadingProvider } from './src/contexts/SmartLoadingContext';
+import SmartLoadingOverlay from './src/components/SmartLoadingOverlay';
+import { SimpleAppProvider } from './src/context/SimpleAppContext';
+
+export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showTest, setShowTest] = useState(false);
+
+  useEffect(() => {
+    initializeApp();
+  }, []);
+
+  const initializeApp = async () => {
+    try {
+      // Simple auth check
+      await AsyncStorage.getItem('userToken');
+      console.log('App initialized successfully');
+    } catch (err) {
+      console.error('App initialization error:', err);
+      setError('App initialization failed');
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+    }
+  };
+
+  const testMainNavigator = () => {
+    try {
+      console.log('Testing MainNavigator...');
+      const MainNavigator = require('./src/navigation/MainNavigator').default;
+      console.log('MainNavigator loaded successfully');
+      return <MainNavigator />;
+    } catch (err) {
+      console.error('MainNavigator error:', err);
+      setError(`MainNavigator Error: ${err.message}`);
+      return null;
+    }
+  };
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+        <Button title="Retry" onPress={() => setError(null)} />
+      </View>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (showTest) {
+    return (
+      <SmartLoadingProvider>
+        <View style={styles.testContainer}>
+          <Text style={styles.testText}>Testing Navigation...</Text>
+          {testMainNavigator()}
+        </View>
+        <SmartLoadingOverlay />
+      </SmartLoadingProvider>
+    );
+  }
+
+  try {
+    return (
+      <SmartLoadingProvider>
+        <SimpleAppProvider>
+          <PaperProvider>
+            <View style={styles.testContainer}>
+              <Text style={styles.testText}>App Loaded Successfully!</Text>
+              <Button 
+                title="Load Main Navigation" 
+                onPress={() => setShowTest(true)} 
+              />
+            </View>
+          </PaperProvider>
+        </SimpleAppProvider>
+        <SmartLoadingOverlay />
+      </SmartLoadingProvider>
+    );
+  } catch (err) {
+    console.error('Component loading error:', err);
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Component loading failed: {err.message}</Text>
+        <Button title="Retry" onPress={() => setError(null)} />
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#2563EB',
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    padding: 20,
+  },
+  errorText: {
+    color: '#dc3545',
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  testContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    padding: 20,
+  },
+  testText: {
+    color: '#2563EB',
+    fontSize: 18,
+    marginBottom: 20,
+  }
+});
