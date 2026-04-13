@@ -19,6 +19,17 @@ if (empty($userId)) {
     exit;
 }
 
+// Ensure customers table exists
+$conn->query("CREATE TABLE IF NOT EXISTS customers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    mobile VARCHAR(20),
+    email VARCHAR(255),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
 switch ($action) {
     case 'get':
         getCustomers($userId);

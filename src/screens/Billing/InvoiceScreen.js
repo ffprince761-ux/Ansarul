@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +10,7 @@ import { AppContext } from '../../context/AppContext';
 const InvoiceScreen = ({ route, navigation }) => {
   const { bill } = route.params || {};
   const { user } = useContext(AppContext);
+  const isPrinting = useRef(false);
 
   // Safety check for bill data
   if (!bill) {
@@ -190,12 +191,15 @@ const InvoiceScreen = ({ route, navigation }) => {
   };
 
   const printInvoice = async () => {
+    if (isPrinting.current) return;
+    isPrinting.current = true;
     try {
       const html = generateHTML();
       await Print.printAsync({ html });
     } catch (error) {
-      // silent
       Alert.alert('Error', 'Failed to print invoice: ' + (error?.message || 'Unknown error'));
+    } finally {
+      isPrinting.current = false;
     }
   };
 

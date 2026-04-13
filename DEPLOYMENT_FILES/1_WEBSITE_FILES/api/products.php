@@ -62,6 +62,7 @@ function addProduct($userId) {
     $category = $data['category'] ?? '';
     $price = $data['price'] ?? 0;
     $stock = $data['stock'] ?? 0;
+    $unit = $data['unit'] ?? 'Nos';
     $lowStockThreshold = $data['lowStockThreshold'] ?? 10;
     $description = $data['description'] ?? '';
     
@@ -71,8 +72,9 @@ function addProduct($userId) {
     }
     
     try {
-        $stmt = $conn->prepare("INSERT INTO products (user_id, name, category, price, stock, low_stock_threshold, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("issddis", $userId, $name, $category, $price, $stock, $lowStockThreshold, $description);
+        $conn->query("ALTER TABLE products ADD COLUMN IF NOT EXISTS unit VARCHAR(20) DEFAULT 'Nos'");
+        $stmt = $conn->prepare("INSERT INTO products (user_id, name, category, price, stock, unit, low_stock_threshold, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("issddsid", $userId, $name, $category, $price, $stock, $unit, $lowStockThreshold, $description);
         
         if ($stmt->execute()) {
             $productId = $conn->insert_id;

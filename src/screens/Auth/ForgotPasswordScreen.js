@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { sendOTP } from '../../services/api';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { sendOTP } from '../../services/api';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -53,150 +54,192 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient
-      colors={['#2563EB', '#1E40AF']}
-      style={styles.container}
-    >
+    <LinearGradient colors={['#1E40AF', '#2563EB', '#3B82F6']} style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Image
-              source={require('../../../assets/icon.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            <Text style={styles.appName}>BINEST</Text>
-            <Text style={styles.title}>Forgot Password?</Text>
-            <Text style={styles.subtitle}>Enter your email to receive OTP</Text>
-          </View>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email Address</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your email"
-                placeholderTextColor="#94A3B8"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-              />
+            {/* Top Branding */}
+            <View style={styles.topSection}>
+              <View style={styles.logoWrapper}>
+                <Image source={require('../../../assets/icon.png')} style={styles.logo} resizeMode="cover" />
+              </View>
+              <Text style={styles.appName}>Binest</Text>
+              <Text style={styles.tagline}>Business Management App</Text>
             </View>
 
-            <TouchableOpacity
-              style={[styles.sendButton, loading && styles.sendButtonDisabled]}
-              onPress={handleSendOTP}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#2563EB" />
-              ) : (
-                <Text style={styles.sendButtonText}>Send OTP</Text>
-              )}
-            </TouchableOpacity>
+            {/* White Card */}
+            <View style={styles.card}>
 
-            <View style={styles.backContainer}>
-              <Text style={styles.backText}>Remember your password? </Text>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={styles.backLink}>Back to Login</Text>
+              {/* Lock Icon */}
+              <View style={styles.iconCircle}>
+                <Ionicons name="lock-open-outline" size={36} color="#2563EB" />
+              </View>
+
+              <Text style={styles.cardTitle}>Forgot Password?</Text>
+              <Text style={styles.cardSubtitle}>Enter your email to receive a verification OTP</Text>
+
+              {/* Email Input */}
+              <View style={styles.inputWrapper}>
+                <Ionicons name="mail-outline" size={20} color="#64748B" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email address"
+                  placeholderTextColor="#94A3B8"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+              </View>
+
+              {/* Send OTP Button */}
+              <TouchableOpacity
+                style={[styles.sendButton, loading && styles.sendButtonDisabled]}
+                onPress={handleSendOTP}
+                disabled={loading}
+              >
+                <LinearGradient colors={['#2563EB', '#1E40AF']} style={styles.sendButtonGradient}>
+                  {loading ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Ionicons name="send-outline" size={18} color="#FFFFFF" />
+                      <Text style={styles.sendButtonText}>Send OTP</Text>
+                    </>
+                  )}
+                </LinearGradient>
               </TouchableOpacity>
+
+              {/* Back to Login */}
+              <TouchableOpacity style={styles.backContainer} onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={16} color="#2563EB" />
+                <Text style={styles.backLink}>  Back to Login</Text>
+              </TouchableOpacity>
+
             </View>
-          </View>
-        </View>
+
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  header: {
+  container: { flex: 1 },
+  safeArea: { flex: 1 },
+  scrollContent: { flexGrow: 1 },
+  topSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    paddingTop: 60,
+    paddingBottom: 36,
+  },
+  logoWrapper: {
+    width: 110,
+    height: 110,
+    borderRadius: 28,
+    overflow: 'hidden',
+    marginBottom: 16,
   },
   logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 15,
+    width: 110,
+    height: 110,
   },
   appName: {
-    fontSize: 36,
-    fontWeight: 'bold',
+    fontSize: 52,
+    fontWeight: '900',
     color: '#FFFFFF',
-    marginBottom: 10,
-    letterSpacing: 3,
+    letterSpacing: 2,
+    marginBottom: 6,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#E0E7FF',
-  },
-  form: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 20,
-    borderRadius: 16,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
+  tagline: {
     fontSize: 14,
-    color: '#FFFFFF',
-    marginBottom: 8,
-    fontWeight: '600',
+    color: '#BFDBFE',
+    letterSpacing: 1,
   },
-  input: {
+  card: {
     backgroundColor: '#FFFFFF',
-    padding: 15,
-    borderRadius: 10,
-    fontSize: 16,
+    borderTopLeftRadius: 36,
+    borderTopRightRadius: 36,
+    padding: 28,
+    paddingTop: 32,
+    paddingBottom: 56,
+    elevation: 12,
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    marginTop: 8,
+  },
+  cardTitle: {
+    fontSize: 24,
+    fontWeight: '800',
     color: '#1E293B',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  cardSubtitle: {
+    fontSize: 13,
+    color: '#64748B',
+    marginBottom: 28,
+    textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: 10,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    marginBottom: 20,
+    paddingHorizontal: 14,
+    width: '100%',
+  },
+  inputIcon: { marginRight: 10 },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1E293B',
+    paddingVertical: 15,
   },
   sendButton: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
+    borderRadius: 14,
+    overflow: 'hidden',
+    width: '100%',
+    marginBottom: 20,
   },
-  sendButtonDisabled: {
-    opacity: 0.7,
+  sendButtonDisabled: { opacity: 0.7 },
+  sendButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 17,
   },
   sendButtonText: {
-    color: '#2563EB',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
   },
   backContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-  },
-  backText: {
-    color: '#E0E7FF',
-    fontSize: 14,
   },
   backLink: {
-    color: '#FFFFFF',
+    color: '#2563EB',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
 });
 

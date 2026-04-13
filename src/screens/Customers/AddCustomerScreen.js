@@ -31,10 +31,12 @@ const AddCustomerScreen = ({ navigation }) => {
       createdAt: new Date().toISOString(),
     };
 
-    await addCustomer(customer);
-    Alert.alert('Success', 'Customer added successfully', [
-      { text: 'OK', onPress: () => navigation.goBack() }
-    ]);
+    const result = await addCustomer(customer);
+    if (result && result.success) {
+      Alert.alert('Success', 'Customer added successfully', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+    }
   };
 
   return (

@@ -437,18 +437,24 @@ export const AppProvider = ({ children }) => {
       const userId = await AsyncStorage.getItem('userId');
 
       if (userId) {
-        // Save to database only
-        const response = await addCustomerAPI(customer);
+        const response = await addCustomerAPI({ ...customer, userId });
         if (response.success) {
-          // Reload customers from database
           const customersResponse = await getCustomers(userId);
           if (customersResponse.success) {
             setCustomers(customersResponse.customers || []);
           }
+          return response;
+        } else {
+          Alert.alert('Error', response.error || 'Failed to add customer');
+          return null;
         }
+      } else {
+        Alert.alert('Error', 'Please login again');
+        return null;
       }
     } catch (error) {
-      // silent
+      Alert.alert('Error', 'Network error, please try again');
+      return null;
     }
   };
 

@@ -40,6 +40,7 @@ const BillingScreen = ({ navigation, route }) => {
   const [discount, setDiscount] = useState(editBill ? String(editBill.discount || '0') : '0');
   const [tax, setTax] = useState(editBill ? String(editBill.tax || '0') : '0');
   const [showCustomerList, setShowCustomerList] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState('');
   const [showProductList, setShowProductList] = useState(false);
   const [productSearch, setProductSearch] = useState('');
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -337,23 +338,58 @@ const BillingScreen = ({ navigation, route }) => {
             <Ionicons name="chevron-down" size={20} color="#64748B" />
           </TouchableOpacity>
 
-          {showCustomerList && (
-            <View style={styles.dropdown}>
-              {customers.map((customer) => (
-                <TouchableOpacity
-                  key={customer.id}
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setSelectedCustomer(customer);
-                    setShowCustomerList(false);
-                  }}
-                >
-                  <Text style={styles.dropdownText}>{customer.name}</Text>
-                  <Text style={styles.dropdownSubtext}>{customer.mobile}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
+          <Modal
+            visible={showCustomerList}
+            transparent
+            animationType="fade"
+            onRequestClose={() => { setShowCustomerList(false); setCustomerSearch(''); }}
+          >
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={() => { setShowCustomerList(false); setCustomerSearch(''); }}
+            >
+              <View style={styles.modalDropdown}>
+                <Text style={styles.modalDropdownTitle}>Select Customer</Text>
+                <View style={styles.customerSearchBar}>
+                  <Ionicons name="search" size={18} color="#64748B" />
+                  <TextInput
+                    style={styles.customerSearchInput}
+                    placeholder="Search customer..."
+                    value={customerSearch}
+                    onChangeText={setCustomerSearch}
+                    autoFocus
+                  />
+                  {customerSearch.length > 0 && (
+                    <TouchableOpacity onPress={() => setCustomerSearch('')}>
+                      <Ionicons name="close-circle" size={18} color="#94A3B8" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <ScrollView>
+                  {customers
+                    .filter(c =>
+                      c.name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+                      c.mobile?.includes(customerSearch)
+                    )
+                    .map((customer) => (
+                      <TouchableOpacity
+                        key={customer.id}
+                        style={styles.dropdownItem}
+                        onPress={() => {
+                          setSelectedCustomer(customer);
+                          setShowCustomerList(false);
+                          setCustomerSearch('');
+                        }}
+                      >
+                        <Text style={styles.dropdownText}>{customer.name}</Text>
+                        <Text style={styles.dropdownSubtext}>{customer.mobile}</Text>
+                      </TouchableOpacity>
+                    ))}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </View>
 
         <View style={styles.section}>
@@ -366,48 +402,63 @@ const BillingScreen = ({ navigation, route }) => {
               >
                 <Ionicons name="create-outline" size={20} color="#10B981" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowProductList(!showProductList)}>
+              <TouchableOpacity onPress={() => { setShowProductList(true); setProductSearch(''); }}>
                 <Ionicons name="add-circle" size={24} color="#2563EB" />
               </TouchableOpacity>
             </View>
           </View>
 
-          {showProductList && (
-            <View style={styles.productList}>
-              <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color="#64748B" />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder={t('searchProducts')}
-                  value={productSearch}
-                  onChangeText={setProductSearch}
-                />
-                {productSearch.length > 0 && (
-                  <TouchableOpacity onPress={() => setProductSearch('')}>
-                    <Ionicons name="close-circle" size={20} color="#94A3B8" />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {filteredProducts.map((product) => (
-                <TouchableOpacity
-                  key={product.id}
-                  style={styles.productItem}
-                  onPress={() => addItem(product)}
-                >
-                  <Text style={styles.productName}>{product.name}</Text>
-                  <View style={styles.productRight}>
-                    <Text style={styles.productPrice}>₹{product.price}</Text>
-                    <Text style={styles.productStock}>Stock: {product.stock}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-              {filteredProducts.length === 0 && (
-                <View style={styles.noResults}>
-                  <Text style={styles.noResultsText}>No products found</Text>
+          <Modal
+            visible={showProductList}
+            transparent
+            animationType="fade"
+            onRequestClose={() => { setShowProductList(false); setProductSearch(''); }}
+          >
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={() => { setShowProductList(false); setProductSearch(''); }}
+            >
+              <View style={styles.modalDropdown}>
+                <Text style={styles.modalDropdownTitle}>Select Product</Text>
+                <View style={styles.customerSearchBar}>
+                  <Ionicons name="search" size={18} color="#64748B" />
+                  <TextInput
+                    style={styles.customerSearchInput}
+                    placeholder="Search product..."
+                    value={productSearch}
+                    onChangeText={setProductSearch}
+                    autoFocus
+                  />
+                  {productSearch.length > 0 && (
+                    <TouchableOpacity onPress={() => setProductSearch('')}>
+                      <Ionicons name="close-circle" size={18} color="#94A3B8" />
+                    </TouchableOpacity>
+                  )}
                 </View>
-              )}
-            </View>
-          )}
+                <ScrollView>
+                  {filteredProducts.map((product) => (
+                    <TouchableOpacity
+                      key={product.id}
+                      style={styles.dropdownItem}
+                      onPress={() => { addItem(product); setShowProductList(false); setProductSearch(''); }}
+                    >
+                      <Text style={styles.dropdownText}>{product.name}</Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={styles.dropdownSubtext}>₹{product.price}</Text>
+                        <Text style={styles.dropdownSubtext}>Stock: {product.stock}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                  {filteredProducts.length === 0 && (
+                    <View style={styles.noResults}>
+                      <Text style={styles.noResultsText}>No products found</Text>
+                    </View>
+                  )}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
+          </Modal>
 
           {showManualEntry && (
             <View style={styles.manualEntryModal}>
@@ -766,6 +817,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 8,
     maxHeight: 200,
+    overflow: 'hidden',
+    zIndex: 999,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   dropdownItem: {
     padding: 16,
@@ -1169,6 +1227,39 @@ const styles = StyleSheet.create({
     color: '#2563EB',
     fontWeight: '600',
     fontSize: 12,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  modalDropdown: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    maxHeight: 350,
+  },
+  modalDropdownTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 12,
+  },
+  customerSearchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  customerSearchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1E293B',
+    marginLeft: 8,
   },
 });
 

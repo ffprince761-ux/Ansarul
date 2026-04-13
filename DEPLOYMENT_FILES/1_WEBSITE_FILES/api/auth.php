@@ -143,6 +143,9 @@ function loginUser() {
         return;
     }
     
+    // Ensure address column exists
+    $conn->query("ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT DEFAULT NULL");
+
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();

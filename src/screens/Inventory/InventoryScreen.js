@@ -64,13 +64,7 @@ const InventoryScreen = ({ navigation }) => {
             <Text style={styles.headerTitle}>{t('inventory')}</Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => navigation.navigate('AddProduct')}
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerButton}>
+            <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('Home')}>
               <Ionicons name="home" size={24} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -122,9 +116,6 @@ const InventoryScreen = ({ navigation }) => {
             <Text style={styles.addButtonText}>{t('addProduct')}</Text>
             <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
           </LinearGradient>
-          <TouchableOpacity style={styles.addIconButton}>
-            <Ionicons name="add" size={24} color="#2563EB" />
-          </TouchableOpacity>
         </TouchableOpacity>
 
         <View style={styles.searchBar}>
