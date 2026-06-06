@@ -2,19 +2,49 @@
 require_once __DIR__ . '/db.php';
 $cfg   = lpGetSettings();
 $secret = $cfg['lp_api_secret'] ?? '';
+$adminUser = $cfg['admin_username'] ?? 'admin';
+$adminPass = $cfg['admin_password'] ?? '';
 $loggedIn = false;
 $error = '';
+$success = '';
+
+/* ── Session helper ─────────────────────────────────────────── */
+function adminSessionKey(string $u, string $p): string {
+    return hash('sha256', 'binest_admin_' . $u . '_' . $p);
+}
 
 /* ── Login ──────────────────────────────────────────────────── */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['secret'])) {
-    if ($_POST['secret'] === $secret) {
-        setcookie('lp_admin', hash('sha256', $secret), time() + 86400, '/');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
+    $u = trim($_POST['username']);
+    $p = trim($_POST['password']);
+    if ($u === $adminUser && password_verify($p, $adminPass)) {
+        setcookie('lp_admin', adminSessionKey($u, $adminPass), time() + 86400, '/');
         $loggedIn = true;
     } else {
-        $error = 'Invalid secret key.';
+        $error = 'Invalid username or password.';
     }
-} elseif (!empty($_COOKIE['lp_admin']) && $_COOKIE['lp_admin'] === hash('sha256', $secret)) {
+} elseif (!empty($_COOKIE['lp_admin']) && $_COOKIE['lp_admin'] === adminSessionKey($adminUser, $adminPass)) {
     $loggedIn = true;
+}
+
+/* ── Change Password ───────────────────────────────────────── */
+if ($loggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['change_password'])) {
+    $old = trim($_POST['old_password'] ?? '');
+    $new = trim($_POST['new_password'] ?? '');
+    $confirm = trim($_POST['confirm_password'] ?? '');
+    if (!password_verify($old, $adminPass)) {
+        $error = 'Current password is incorrect.';
+    } elseif (strlen($new) < 6) {
+        $error = 'New password must be at least 6 characters.';
+    } elseif ($new !== $confirm) {
+        $error = 'New passwords do not match.';
+    } else {
+        $newHash = password_hash($new, PASSWORD_DEFAULT);
+        lpSaveSettings(['admin_password' => $newHash]);
+        setcookie('lp_admin', adminSessionKey($adminUser, $newHash), time() + 86400, '/');
+        $success = 'Password updated successfully.';
+        $adminPass = $newHash;
+    }
 }
 
 /* ── Actions ────────────────────────────────────────────────── */
@@ -104,6 +134,20 @@ tr:hover td{background:rgba(79,70,229,.02)}
 .empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 .empty i{font-size:36px;color:var(--light);margin-bottom:12px;display:block}
 
+/* Settings panel */
+.settings-panel{margin-bottom:32px}
+.settings-toggle{width:100%;display:flex;align-items:center;gap:10px;padding:14px 20px;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-weight:700;color:var(--text);font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
+.settings-toggle:hover{border-color:var(--indigo);color:var(--indigo)}
+.settings-box{display:none;background:#fff;border:1.5px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:24px;max-width:420px}
+.settings-box.open{display:block}
+.settings-box h3{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text)}
+.settings-box input{width:100%;padding:12px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);outline:none;margin-bottom:10px;transition:all .2s}
+.settings-box input:focus{border-color:var(--indigo);background:#fff;box-shadow:0 0 0 4px rgba(79,70,229,.06)}
+.settings-box button{width:100%;padding:12px;background:var(--indigo);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .25s}
+.settings-box button:hover{background:var(--indigo-d)}
+.settings-err{color:var(--red);font-size:13px;font-weight:600;margin-bottom:12px;padding:10px 14px;background:#FEF2F2;border-radius:8px}
+.settings-ok{color:var(--green);font-size:13px;font-weight:600;margin-bottom:12px;padding:10px 14px;background:#ECFDF5;border-radius:8px}
+
 /* Responsive */
 @media(max-width:768px){
   .dash{padding:20px}
@@ -120,12 +164,14 @@ tr:hover td{background:rgba(79,70,229,.02)}
   <div class="login-box">
     <img src="images/icon.png" alt="Binest">
     <h1>Binest Admin</h1>
-    <p>Enter your secret key to access leads dashboard.</p>
+    <p>Sign in to access your leads dashboard.</p>
     <?php if($error): ?><div class="login-err"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-    <form method="POST">
-      <input type="password" name="secret" placeholder="Secret Key" required autofocus>
-      <button type="submit"><i class="fas fa-lock"></i> Access Dashboard</button>
+    <form method="POST" autocomplete="off">
+      <input type="text" name="username" placeholder="Username" value="admin" required autofocus autocomplete="username">
+      <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+      <button type="submit"><i class="fas fa-lock"></i> Sign In</button>
     </form>
+    <p style="font-size:12px;color:var(--muted);margin-top:16px">Default: <b>admin</b> / <b>admin123</b></p>
   </div>
 </div>
 
@@ -153,6 +199,25 @@ tr:hover td{background:rgba(79,70,229,.02)}
     <div class="stat-card">
       <div class="stat-icon" style="background:#7C3AED"><i class="fas fa-clock"></i></div>
       <div class="stat-info"><h3><?= number_format(lpCountNew()) ?></h3><p>New Leads</p></div>
+    </div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-panel">
+    <button class="settings-toggle" onclick="document.getElementById('settingsBox').classList.toggle('open')">
+      <i class="fas fa-cog"></i> Settings <i class="fas fa-chevron-down" style="margin-left:auto"></i>
+    </button>
+    <div class="settings-box" id="settingsBox">
+      <?php if($error && !empty($_POST['change_password'])): ?><div class="settings-err"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+      <?php if($success): ?><div class="settings-ok"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+      <h3><i class="fas fa-key"></i> Change Password</h3>
+      <form method="POST">
+        <input type="hidden" name="change_password" value="1">
+        <input type="password" name="old_password" placeholder="Current Password" required>
+        <input type="password" name="new_password" placeholder="New Password (min 6 chars)" required minlength="6">
+        <input type="password" name="confirm_password" placeholder="Confirm New Password" required minlength="6">
+        <button type="submit"><i class="fas fa-save"></i> Update Password</button>
+      </form>
     </div>
   </div>
 

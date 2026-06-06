@@ -61,6 +61,8 @@ try {
         'windows_url'    => '',
         'lp_api_secret'  => 'binest_' . substr(md5('binest_secret_2025'), 0, 16),
         'lp_page_url'    => 'https://lightgrey-sparrow-526806.hostingersite.com/landing_page',
+        'admin_username' => 'admin',
+        'admin_password' => password_hash('admin123', PASSWORD_DEFAULT),
     ];
     $ins = $lpPdo->prepare("INSERT IGNORE INTO lp_settings (setting_key,setting_value) VALUES(?,?)");
     foreach ($defaults as $k => $v) $ins->execute([$k, $v]);
