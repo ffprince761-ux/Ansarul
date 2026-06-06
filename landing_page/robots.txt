@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /privacy.php
+Allow: /terms.php
+Allow: /delete-account.php
+Disallow: /admin.php
+Disallow: /db.php
+Disallow: /save_request.php
+Disallow: /upload_apk.php
+
+Sitemap: sitemap.php
