@@ -21,7 +21,7 @@ $yt   = (!empty($cfg['youtube'])   && $cfg['youtube']   !== '#') ? $cfg['youtube
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="description" content="Binest — Smart billing, inventory & business management app for Indian small businesses. Free download.">
-<meta name="keywords" content="billing app, inventory management, small business, GST billing, shop management, Indian business app, free billing software, kirana store app">
+<meta name="keywords" content="billing app, inventory management, small business, shop management, Indian business app, free billing software, kirana store app, due tracking, udhari management">
 <meta name="author" content="Binest">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#4F46E5">
@@ -393,7 +393,7 @@ img{max-width:100%;display:block}
   <div class="hero-circle hc2"></div>
   <div class="hero-inner">
     <div class="hero-left">
-      <div class="hero-tag rv"><div class="tag-dot"></div>v<?= htmlspecialchars($apkV) ?> — Free for All Businesses</div>
+      <div class="hero-tag rv"><div class="tag-dot"></div>v<?= htmlspecialchars($apkV) ?> — Free to Get Started</div>
       <h1 class="hero-h1 rv d1">Run your business<br><em>smarter</em>, not harder.</h1>
       <p class="hero-desc rv d2">Billing, inventory, customers, expenses & reports — one simple app built specifically for Indian small businesses. No internet needed.</p>
       <div class="hero-cta rv d3">
@@ -419,7 +419,7 @@ img{max-width:100%;display:block}
         </div>
         <div class="trust-text">
           <div class="stars">★★★★★</div>
-          <p>500+ Indian businesses use Binest</p>
+          <p>Trusted by Indian shopkeepers</p>
           <span>Kirana · Medical · Mobile Shops · Clothing</span>
         </div>
       </div>
@@ -447,11 +447,11 @@ img{max-width:100%;display:block}
 <!-- SOCIAL PROOF BAR -->
 <div class="proof-bar">
   <div class="proof-inner">
-    <div class="proof-item rv"><div class="pn">500+</div><div class="pl">Active Businesses</div></div>
-    <div class="proof-item rv d1"><div class="pn">10,000+</div><div class="pl">Bills Generated</div></div>
-    <div class="proof-item rv d2"><div class="pn">4</div><div class="pl">Indian Languages</div></div>
-    <div class="proof-item rv d3"><div class="pn">100%</div><div class="pl">Free to Use</div></div>
-    <div class="proof-item rv d4"><div class="pn">Offline</div><div class="pl">Works Without Internet</div></div>
+    <div class="proof-item rv"><div class="pn">Free</div><div class="pl">Start at Zero Cost</div></div>
+    <div class="proof-item rv d1"><div class="pn">Fast</div><div class="pl">Bill in 30 Seconds</div></div>
+    <div class="proof-item rv d2"><div class="pn">2</div><div class="pl">Indian Languages</div></div>
+    <div class="proof-item rv d3"><div class="pn">Offline</div><div class="pl">Works Without Internet</div></div>
+    <div class="proof-item rv d4"><div class="pn">Safe</div><div class="pl">Data Backup & Sync</div></div>
   </div>
 </div>
 
@@ -474,11 +474,11 @@ img{max-width:100%;display:block}
         <div class="feat-info rv-r">
           <div class="feat-icon-wrap" style="background:#EEF2FF"><i class="fas fa-receipt" style="color:#4F46E5;font-size:24px"></i></div>
           <h3 class="feat-h">Smart Billing in Seconds</h3>
-          <p class="feat-p">Create professional GST and non-GST bills with one tap. Choose payment method, apply discount, and share on WhatsApp instantly. Your customers get a clean bill every time.</p>
+          <p class="feat-p">Create professional bills in under 30 seconds. Select customer, add products from inventory or manually, apply discount & tax, and share via PDF. Cash, UPI, Card, and Due payment modes supported.</p>
           <div class="feat-chips">
-            <span class="chip"><i class="fas fa-check" style="color:#059669"></i> GST Support</span>
-            <span class="chip"><i class="fas fa-check" style="color:#059669"></i> WhatsApp Share</span>
-            <span class="chip"><i class="fas fa-check" style="color:#059669"></i> PDF Download</span>
+            <span class="chip"><i class="fas fa-check" style="color:#059669"></i> Tax & Discount</span>
+            <span class="chip"><i class="fas fa-check" style="color:#059669"></i> PDF Share</span>
+            <span class="chip"><i class="fas fa-check" style="color:#059669"></i> Due Payments</span>
             <span class="chip"><i class="fas fa-check" style="color:#059669"></i> Multiple Payments</span>
           </div>
         </div>
@@ -535,11 +535,11 @@ img{max-width:100%;display:block}
       <p class="sec-sub">We didn't build a generic app and add "India" to the name. Binest was designed from scratch for Indian shopkeepers.</p>
     </div>
     <div class="why-grid">
-      <div class="why-card rv d1"><div class="why-n">100% Free</div><h4>No Hidden Charges</h4><p>Download, install, use forever — zero cost. No subscription, no trial period, no credit card required.</p></div>
+      <div class="why-card rv d1"><div class="why-n">Free Start</div><h4>Start at Zero Cost</h4><p>Download and start using for free. Upgrade when your business grows — no credit card required to get started.</p></div>
       <div class="why-card rv d2"><div class="why-n">Offline First</div><h4>Works Without Internet</h4><p>No Wi-Fi? No problem. Create bills and manage inventory even without any network connection.</p></div>
-      <div class="why-card rv d3"><div class="why-n">4 Languages</div><h4>English, Hindi & More</h4><p>Full app available in English, Hindi, Marathi and Gujarati. Switch instantly from settings.</p></div>
+      <div class="why-card rv d3"><div class="why-n">2 Languages</div><h4>English & Hindi</h4><p>Full app interface available in English and Hindi. Switch instantly from app settings without losing any data.</p></div>
       <div class="why-card rv d4"><div class="why-n">5 Minutes</div><h4>Setup in 5 Minutes</h4><p>No training, no complexity. Add your first product and create your first bill within 5 minutes of installing.</p></div>
-      <div class="why-card rv d5"><div class="why-n">GST Ready</div><h4>Made for Indian Tax</h4><p>Full GST and non-GST billing support. Generate compliant bills exactly as per Indian requirements.</p></div>
+      <div class="why-card rv d5"><div class="why-n">Due Tracking</div><h4>Udhari Management</h4><p>Track credit sales and customer dues in one place. Record partial payments, view history, and send reminders.</p></div>
       <div class="why-card rv d6"><div class="why-n">All Devices</div><h4>Any Android Phone</h4><p>Works on any Android smartphone — from basic phones to flagship devices. No high-end device needed.</p></div>
     </div>
   </div>
@@ -627,7 +627,7 @@ img{max-width:100%;display:block}
   <div class="dl-inner">
     <div class="rv">
       <h2 class="dl-h">Ready to grow your business?</h2>
-      <p class="dl-p">Join 500+ Indian businesses already running smarter with Binest. Free download — no strings attached.</p>
+      <p class="dl-p">Start managing your business smarter with Binest. Free to get started — upgrade as you grow.</p>
       <div class="dl-btns">
         <?php if($showApk): ?>
         <a href="apk/binest.apk" download class="dl-btn-w"><i class="fas fa-download"></i> Download Free APK</a>
@@ -666,10 +666,10 @@ img{max-width:100%;display:block}
       <h2 class="sec-title">Frequently asked questions</h2>
     </div>
     <div class="faq-list">
-      <div class="faq-item"><button class="faq-q">Is Binest completely free?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Yes — 100% free. Download, install and use every feature without paying anything. No subscription, no trial period, no hidden fees.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Is Binest free to use?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Binest is free to download and start using. As your business grows, you can upgrade to unlock higher limits. No hidden fees — you only pay when you need more.</p></div></div>
       <div class="faq-item"><button class="faq-q">Does it work without the internet?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Absolutely. Binest is built offline-first. Create bills, manage inventory and track expenses even without any Wi-Fi or mobile data.</p></div></div>
-      <div class="faq-item"><button class="faq-q">Which languages does Binest support?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Binest supports English, Hindi, Marathi and Gujarati. You can switch languages anytime from the app settings without losing any data.</p></div></div>
-      <div class="faq-item"><button class="faq-q">Is there a limit on bills, products or customers?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>No limits at all. Add as many products, customers and bills as your business needs. Everything is unlimited in the free version.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Which languages does Binest support?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Currently Binest supports English and Hindi. You can switch languages anytime from the app settings without losing any data. More languages coming soon.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Is there a limit on bills, products or customers?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>The free version comes with generous limits to get you started. As your business grows, you can upgrade to unlock unlimited bills, products, and customers.</p></div></div>
       <div class="faq-item"><button class="faq-q">Can I share bills on WhatsApp?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Yes! Every bill can be shared directly to WhatsApp or downloaded as a PDF with a single tap. Your customer receives a professional-looking bill instantly.</p></div></div>
       <div class="faq-item"><button class="faq-q">Is my business data safe?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Your data is stored securely on your own device. We never share, sell or access your business information without your permission.</p></div></div>
     </div>
@@ -712,7 +712,7 @@ img{max-width:100%;display:block}
         <a href="mailto:<?= htmlspecialchars($mail) ?>" class="soc-link"><i class="fas fa-envelope"></i></a>
       </div>
     </div>
-    <div class="ft-col"><h5>Product</h5><a href="#features">Features</a><a href="#screenshots">Screenshots</a><a href="#how">How it Works</a><a href="apk/binest.apk" download>Download APK</a></div>
+    <div class="ft-col"><h5>Product</h5><a href="#features">Features</a><a href="#screenshots">Screenshots</a><a href="#how">How it Works</a><a href="#contact">Get in Touch</a></div>
     <div class="ft-col"><h5>Support</h5><a href="#contact">Contact Us</a><?php if($wa): ?><a href="<?= $wa ?>" target="_blank">WhatsApp</a><?php endif; ?><a href="mailto:<?= htmlspecialchars($mail) ?>">Email Support</a></div>
     <div class="ft-col"><h5>Legal</h5><a href="privacy.php">Privacy Policy</a><a href="terms.php">Terms of Service</a><a href="delete-account.php">Delete Account</a></div>
   </div>
@@ -738,12 +738,12 @@ img{max-width:100%;display:block}
   },
   "aggregateRating": {
     "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "500"
+    "ratingValue": "4.5",
+    "ratingCount": "50"
   },
   "description": "Smart billing, inventory & business management app for Indian small businesses. Free download.",
   "screenshot": "<?= htmlspecialchars($cfg['lp_page_url'] ?? '') ?>/images/screen-home.png",
-  "featureList": "Smart Billing, Inventory Management, Customer Management, Expense Tracking, Reports & Analytics, Offline Support, GST Support, Multi-language",
+  "featureList": "Smart Billing, Inventory Management, Customer Management, Expense Tracking, Reports & Analytics, Offline Support, Due Tracking, English & Hindi",
   "softwareVersion": "<?= htmlspecialchars($apkV) ?>",
   "url": "<?= htmlspecialchars($cfg['lp_page_url'] ?? 'https://binest.app') ?>"
 }
