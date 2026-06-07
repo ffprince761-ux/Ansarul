@@ -30,7 +30,7 @@ $yt   = (!empty($cfg['youtube'])   && $cfg['youtube']   !== '#') ? $cfg['youtube
 <meta property="og:type" content="website">
 <meta property="og:url" content="<?= htmlspecialchars($cfg['lp_page_url'] ?? 'https://binest.app') ?>">
 <meta property="og:title" content="Binest — Smart Business Management App">
-<meta property="og:description" content="Billing, inventory, customers, expenses & reports — one simple app built for Indian small businesses. Free & offline.">
+<meta property="og:description" content="Billing, inventory, customers, expenses & reports — one simple app built for Indian small businesses. Free to get started.">
 <meta property="og:image" content="<?= htmlspecialchars($cfg['lp_page_url'] ?? '') ?>/images/banner.png">
 <meta property="og:locale" content="en_IN">
 
@@ -38,7 +38,7 @@ $yt   = (!empty($cfg['youtube'])   && $cfg['youtube']   !== '#') ? $cfg['youtube
 <meta property="twitter:card" content="summary_large_image">
 <meta property="twitter:url" content="<?= htmlspecialchars($cfg['lp_page_url'] ?? 'https://binest.app') ?>">
 <meta property="twitter:title" content="Binest — Smart Business Management App">
-<meta property="twitter:description" content="Billing, inventory, customers, expenses & reports — one simple app built for Indian small businesses. Free & offline.">
+<meta property="twitter:description" content="Billing, inventory, customers, expenses & reports — one simple app built for Indian small businesses. Free to get started.">
 <meta property="twitter:image" content="<?= htmlspecialchars($cfg['lp_page_url'] ?? '') ?>/images/banner.png">
 
 <!-- Canonical URL -->
@@ -395,7 +395,7 @@ img{max-width:100%;display:block}
     <div class="hero-left">
       <div class="hero-tag rv"><div class="tag-dot"></div>v<?= htmlspecialchars($apkV) ?> — Free to Get Started</div>
       <h1 class="hero-h1 rv d1">Run your business<br><em>smarter</em>, not harder.</h1>
-      <p class="hero-desc rv d2">Billing, inventory, customers, expenses & reports — one simple app built specifically for Indian small businesses. No internet needed.</p>
+      <p class="hero-desc rv d2">Billing, inventory, customers, expenses & reports — one simple app built specifically for Indian small businesses. Sign up and start managing your shop in minutes.</p>
       <div class="hero-cta rv d3">
         <?php if($showApk): ?>
         <a href="apk/binest.apk" download class="cta-main"><i class="fas fa-download"></i> Download Free APK</a>
@@ -450,8 +450,8 @@ img{max-width:100%;display:block}
     <div class="proof-item rv"><div class="pn">Free</div><div class="pl">Start at Zero Cost</div></div>
     <div class="proof-item rv d1"><div class="pn">Fast</div><div class="pl">Bill in 30 Seconds</div></div>
     <div class="proof-item rv d2"><div class="pn">2</div><div class="pl">Indian Languages</div></div>
-    <div class="proof-item rv d3"><div class="pn">Offline</div><div class="pl">Works Without Internet</div></div>
-    <div class="proof-item rv d4"><div class="pn">Safe</div><div class="pl">Data Backup & Sync</div></div>
+    <div class="proof-item rv d3"><div class="pn">Sync</div><div class="pl">Data Synced to Server</div></div>
+    <div class="proof-item rv d4"><div class="pn">Safe</div><div class="pl">Secure Data Storage</div></div>
   </div>
 </div>
 
@@ -536,7 +536,7 @@ img{max-width:100%;display:block}
     </div>
     <div class="why-grid">
       <div class="why-card rv d1"><div class="why-n">Free Start</div><h4>Start at Zero Cost</h4><p>Download and start using for free. Upgrade when your business grows — no credit card required to get started.</p></div>
-      <div class="why-card rv d2"><div class="why-n">Offline First</div><h4>Works Without Internet</h4><p>No Wi-Fi? No problem. Create bills and manage inventory even without any network connection.</p></div>
+      <div class="why-card rv d2"><div class="why-n">Data Sync</div><h4>Auto-Sync to Server</h4><p>Your data is securely stored on the server. Access your business records from anywhere, on any device with your login.</p></div>
       <div class="why-card rv d3"><div class="why-n">2 Languages</div><h4>English & Hindi</h4><p>Full app interface available in English and Hindi. Switch instantly from app settings without losing any data.</p></div>
       <div class="why-card rv d4"><div class="why-n">5 Minutes</div><h4>Setup in 5 Minutes</h4><p>No training, no complexity. Add your first product and create your first bill within 5 minutes of installing.</p></div>
       <div class="why-card rv d5"><div class="why-n">Due Tracking</div><h4>Udhari Management</h4><p>Track credit sales and customer dues in one place. Record partial payments, view history, and send reminders.</p></div>
@@ -667,11 +667,11 @@ img{max-width:100%;display:block}
     </div>
     <div class="faq-list">
       <div class="faq-item"><button class="faq-q">Is Binest free to use?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Binest is free to download and start using. As your business grows, you can upgrade to unlock higher limits. No hidden fees — you only pay when you need more.</p></div></div>
-      <div class="faq-item"><button class="faq-q">Does it work without the internet?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Absolutely. Binest is built offline-first. Create bills, manage inventory and track expenses even without any Wi-Fi or mobile data.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Do I need internet to use Binest?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Yes — Binest requires an internet connection to sync your data with the server. This keeps your records safe and accessible from any device. A stable connection ensures the best experience.</p></div></div>
       <div class="faq-item"><button class="faq-q">Which languages does Binest support?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Currently Binest supports English and Hindi. You can switch languages anytime from the app settings without losing any data. More languages coming soon.</p></div></div>
       <div class="faq-item"><button class="faq-q">Is there a limit on bills, products or customers?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>The free version comes with generous limits to get you started. As your business grows, you can upgrade to unlock unlimited bills, products, and customers.</p></div></div>
       <div class="faq-item"><button class="faq-q">Can I share bills on WhatsApp?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Yes! Every bill can be shared directly to WhatsApp or downloaded as a PDF with a single tap. Your customer receives a professional-looking bill instantly.</p></div></div>
-      <div class="faq-item"><button class="faq-q">Is my business data safe?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Your data is stored securely on your own device. We never share, sell or access your business information without your permission.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Is my business data safe?<div class="icon"><i class="fas fa-plus" style="font-size:11px;color:var(--muted)"></i></div></button><div class="faq-a"><p>Your data is stored securely on our server with encrypted connections. We never share, sell or access your business information without your permission.</p></div></div>
     </div>
   </div>
 </section>
@@ -703,7 +703,7 @@ img{max-width:100%;display:block}
     <div class="ft-brand">
       <img src="images/icon.png" alt="Binest" width="36" height="36" loading="lazy">
       <div class="ft-brand-name">Binest</div>
-      <p>Smart business management for every Indian small business. Free, fast and offline-ready.</p>
+      <p>Smart business management for every Indian small business. Free, fast and always synced.</p>
       <div class="soc-links">
         <?php if($ig): ?><a href="<?= htmlspecialchars($ig) ?>" target="_blank" class="soc-link"><i class="fab fa-instagram"></i></a><?php endif; ?>
         <?php if($fb): ?><a href="<?= htmlspecialchars($fb) ?>" target="_blank" class="soc-link"><i class="fab fa-facebook-f"></i></a><?php endif; ?>
@@ -743,7 +743,7 @@ img{max-width:100%;display:block}
   },
   "description": "Smart billing, inventory & business management app for Indian small businesses. Free download.",
   "screenshot": "<?= htmlspecialchars($cfg['lp_page_url'] ?? '') ?>/images/screen-home.png",
-  "featureList": "Smart Billing, Inventory Management, Customer Management, Expense Tracking, Reports & Analytics, Offline Support, Due Tracking, English & Hindi",
+  "featureList": "Smart Billing, Inventory Management, Customer Management, Expense Tracking, Reports & Analytics, Data Sync, Due Tracking, English & Hindi",
   "softwareVersion": "<?= htmlspecialchars($apkV) ?>",
   "url": "<?= htmlspecialchars($cfg['lp_page_url'] ?? 'https://binest.app') ?>"
 }
