@@ -1,12 +1,12 @@
 <?php
-// ─── Landing Page — Shared Database Connection ──────────────────
-// Same DB as Owner Panel. All LP data stored in lp_* tables.
+// ─── Landing Page — Separate Database Connection ──────────────
+// Uses its own DB. All LP data stored in lp_* tables.
 
 date_default_timezone_set('Asia/Kolkata');
 
 $_LP_HOST = 'localhost';
-$_LP_DB   = 'u946320467_binest';
-$_LP_USER = 'u946320467_binest';
+$_LP_DB   = 'u946320467_binest_lp';   // <-- SEPARATE landing page DB
+$_LP_USER = 'u946320467_binest_lp';    // <-- Create this user in cPanel
 $_LP_PASS = 'Binest@28';
 
 try {
@@ -79,6 +79,23 @@ try {
 
 } catch (PDOException $e) {
     $lpPdo = null;
+    // Friendly hint if DB doesn't exist yet
+    if (strpos($e->getMessage(), 'Unknown database') !== false) {
+        die('<div style="font-family:sans-serif;padding:40px;text-align:center;max-width:600px;margin:0 auto;">
+            <h2 style="color:#DC2626">Database Not Found</h2>
+            <p style="color:#6B7280;line-height:1.7">The landing page database <code style="background:#F3F4F6;padding:2px 6px;border-radius:4px;">' . htmlspecialchars($_LP_DB) . '</code> does not exist yet.</p>
+            <p style="color:#111827;font-weight:600;margin-top:20px">Steps to fix:</p>
+            <ol style="text-align:left;color:#6B7280;line-height:2;max-width:400px;margin:20px auto;">
+                <li>Login to your hosting cPanel</li>
+                <li>Go to <b>MySQL Database Wizard</b></li>
+                <li>Create database: <code>' . htmlspecialchars($_LP_DB) . '</code></li>
+                <li>Create user: <code>' . htmlspecialchars($_LP_USER) . '</code></li>
+                <li>Password: <code>' . htmlspecialchars($_LP_PASS) . '</code></li>
+                <li>Add user to database with <b>ALL PRIVILEGES</b></li>
+                <li>Refresh this page</li>
+            </ol>
+        </div>');
+    }
 }
 
 // ════════════════════════════════════════════════════════════════
