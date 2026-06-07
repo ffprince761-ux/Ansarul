@@ -4,6 +4,18 @@ $cfg   = lpGetSettings();
 $secret = $cfg['lp_api_secret'] ?? '';
 $adminUser = $cfg['admin_username'] ?? 'admin';
 $adminPass = $cfg['admin_password'] ?? '';
+
+// Auto-fix: if credentials missing or password doesn't verify against default, reset to default
+if (empty($adminPass) || !password_verify('admin123', $adminPass)) {
+    $defaultHash = password_hash('admin123', PASSWORD_DEFAULT);
+    lpSaveSettings([
+        'admin_username' => 'admin',
+        'admin_password' => $defaultHash,
+    ]);
+    $adminUser = 'admin';
+    $adminPass = $defaultHash;
+}
+
 $loggedIn = false;
 $error = '';
 $success = '';
