@@ -67,6 +67,16 @@ try {
     $ins = $lpPdo->prepare("INSERT IGNORE INTO lp_settings (setting_key,setting_value) VALUES(?,?)");
     foreach ($defaults as $k => $v) $ins->execute([$k, $v]);
 
+    // Ensure admin credentials exist even in older databases
+    foreach (['admin_username','admin_password'] as $adminKey) {
+        $check = $lpPdo->prepare("SELECT 1 FROM lp_settings WHERE setting_key=?");
+        $check->execute([$adminKey]);
+        if (!$check->fetch()) {
+            $lpPdo->prepare("INSERT INTO lp_settings (setting_key,setting_value) VALUES(?,?)")
+                ->execute([$adminKey, $defaults[$adminKey]]);
+        }
+    }
+
 } catch (PDOException $e) {
     $lpPdo = null;
 }
