@@ -7,7 +7,7 @@ $mail = $cfg['email']       ?? 'binestmanage@gmail.com';
 $apkV = $cfg['apk_version'] ?? '1.0.0';
 $ps      = $cfg['play_store']    ?? '';
 $vid     = $cfg['video_url']     ?? '';
-$psMode  = $cfg['playstore_mode'] ?? 'coming_soon';
+$psMode  = $cfg['playstore_mode'] ?? 'link';
 $showApk = ($cfg['show_apk']      ?? '1') === '1';
 $showWin = ($cfg['show_windows']  ?? '0') === '1';
 $winUrl  = $cfg['windows_url']    ?? '';
