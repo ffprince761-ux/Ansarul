@@ -366,7 +366,8 @@ img{max-width:100%;display:block}
   </div>
   <div class="nav-actions">
     <?php if($wa): ?><a href="<?= $wa ?>" target="_blank" class="btn-ghost"><i class="fab fa-whatsapp"></i> WhatsApp</a><?php endif; ?>
-    <a href="apk/binest.apk" download class="btn-primary"><i class="fas fa-download"></i> Free Download</a>
+    <?php if($psMode==='link' && !empty($ps)): ?><a href="<?= htmlspecialchars($ps) ?>" target="_blank" class="btn-primary"><i class="fab fa-google-play"></i> Get on Play Store</a>
+    <?php elseif($showApk): ?><a href="apk/binest.apk" download class="btn-primary"><i class="fas fa-download"></i> Free Download</a><?php endif; ?>
     <div class="lang-switch">
       <select id="langSelect" onchange="changeLang(this.value)">
         <option value="en">EN</option>
@@ -400,9 +401,9 @@ img{max-width:100%;display:block}
         <a href="apk/binest.apk" download class="cta-main"><i class="fas fa-download"></i> Download Free APK</a>
         <?php endif; ?>
         <?php if($psMode==='link' && !empty($ps)): ?>
-        <a href="<?= htmlspecialchars($ps) ?>" target="_blank" class="cta-play"><i class="fab fa-google-play"></i> Play Store</a>
+        <a href="<?= htmlspecialchars($ps) ?>" target="_blank" class="<?= $showApk ? 'cta-play' : 'cta-main' ?>"><i class="fab fa-google-play"></i> Play Store</a>
         <?php elseif($psMode==='coming_soon'): ?>
-        <span class="cta-soon"><i class="fab fa-google-play"></i> Play Store <span class="soon-badge">Coming Soon</span></span>
+        <span class="<?= $showApk ? 'cta-soon' : 'cta-main' ?>" style="<?= $showApk ? '' : 'background:#fff;color:var(--indigo);cursor:default' ?>"><i class="fab fa-google-play"></i> Play Store <span class="soon-badge">Coming Soon</span></span>
         <?php endif; ?>
         <?php if($showWin && !empty($winUrl)): ?>
         <a href="<?= htmlspecialchars($winUrl) ?>" target="_blank" class="cta-win"><i class="fab fa-windows"></i> Windows</a>
@@ -577,7 +578,7 @@ img{max-width:100%;display:block}
       <div class="how-step rv d1">
         <div class="how-num">1</div>
         <h4>Download Binest</h4>
-        <p>Get the app from Google Play or download our APK directly. Install in under a minute on any Android phone.</p>
+        <p>Get the app from Google Play Store. Install in under a minute on any Android phone.</p>
       </div>
       <div class="how-step rv d2">
         <div class="how-num">2</div>
@@ -631,9 +632,9 @@ img{max-width:100%;display:block}
         <?php if($showApk): ?>
         <a href="apk/binest.apk" download class="dl-btn-w"><i class="fas fa-download"></i> Download Free APK</a>
         <?php endif; ?>
+        <?php if($psMode==='link' && !empty($ps)): ?><a href="<?= htmlspecialchars($ps) ?>" target="_blank" class="<?= $showApk ? 'dl-btn-g' : 'dl-btn-w' ?>"><i class="fab fa-google-play"></i> Play Store</a>
+        <?php elseif($psMode==='coming_soon'): ?><span class="<?= $showApk ? 'dl-btn-g' : 'dl-btn-w' ?>" style="<?= $showApk ? 'opacity:.65;cursor:default' : 'cursor:default' ?>"><i class="fab fa-google-play"></i> Play Store &nbsp;<span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:999px;font-size:11px">Coming Soon</span></span><?php endif; ?>
         <?php if($wa): ?><a href="<?= $wa ?>" target="_blank" class="dl-btn-g"><i class="fab fa-whatsapp"></i> WhatsApp Us</a><?php endif; ?>
-        <?php if($psMode==='link' && !empty($ps)): ?><a href="<?= htmlspecialchars($ps) ?>" target="_blank" class="dl-btn-g"><i class="fab fa-google-play"></i> Play Store</a>
-        <?php elseif($psMode==='coming_soon'): ?><span class="dl-btn-g" style="opacity:.65;cursor:default"><i class="fab fa-google-play"></i> Play Store &nbsp;<span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:999px;font-size:11px">Coming Soon</span></span><?php endif; ?>
         <?php if($showWin && !empty($winUrl)): ?><a href="<?= htmlspecialchars($winUrl) ?>" target="_blank" class="dl-btn-g"><i class="fab fa-windows"></i> Windows</a><?php endif; ?>
       </div>
     </div>

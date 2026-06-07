@@ -56,7 +56,7 @@ try {
         'youtube'        => '',
         'twitter'        => '',
         'playstore_mode' => 'coming_soon',
-        'show_apk'       => '1',
+        'show_apk'       => '0',
         'show_windows'   => '0',
         'windows_url'    => '',
         'lp_api_secret'  => 'binest_' . substr(md5('binest_secret_2025'), 0, 16),
